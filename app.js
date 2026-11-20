@@ -776,9 +776,9 @@ function renderFlightInformation() {
         <section class="flight-panel"><div class="flight-panel-head"><h3>Destination &amp; Timings</h3></div>
           <div class="flight-fields">
             <label class="flight-field"><span>Destination</span><select name="destination"><option value="">Select destination</option>${destinationOptions}</select></label>
-            <label class="flight-field"><span>Push Back Time (Dublin local)</span><input name="pushback" type="datetime-local"></label>
+            <div class="flight-field pushback-time-field"><label for="pushback-time">Push Back Time (Dublin local)</label><input id="pushback-time" name="pushback" type="datetime-local"><button class="current-time-button" type="button" id="use-current-pushback-time">Use current time</button></div>
             <div class="flight-duration-pair">
-              <label class="flight-field taxi-minutes-field"><span>Taxi (mins)</span><input name="taxiMinutes" type="number" min="0" step="1" inputmode="numeric" placeholder="10"></label>
+              <label class="flight-field taxi-minutes-field"><span>Taxi (mins)</span><input name="taxiMinutes" type="number" min="1" step="1" inputmode="numeric" placeholder="0"></label>
               <fieldset class="flight-field duration-field"><legend>Flight Time</legend><div><label><input name="flightHours" type="number" min="0" max="30" inputmode="numeric" placeholder="0"><small>hours</small></label><b>:</b><label><input name="flightMinutes" type="number" min="0" max="59" inputmode="numeric" placeholder="00"><small>minutes</small></label></div></fieldset>
             </div>
           </div>
@@ -829,6 +829,12 @@ function renderFlightInformation() {
       ? `ESTIMATED ARRIVAL · ${destination.name.toUpperCase()} LOCAL TIME`
       : 'DESTINATION LOCAL TIME';
 
+    if (hasTaxiTime && taxiMinutes < 1) {
+      estimatedDublin.textContent = 'Enter a taxi time of at least 1 minute';
+      estimatedDestination.textContent = destination ? 'Enter a taxi time of at least 1 minute' : 'Select destination';
+      return;
+    }
+
     if (!pushbackValue || !hasFlightTime || !hasTaxiTime) {
       estimatedDublin.textContent = 'Enter push back time, taxi time and flight time';
       estimatedDestination.textContent = destination ? 'Enter timings to calculate' : 'Select destination';
@@ -837,7 +843,7 @@ function renderFlightInformation() {
 
     const pushback = new Date(pushbackValue);
     const invalidDuration = flightHours < 0 || flightHours > 30 || flightMinutes < 0 || flightMinutes > 59
-      || taxiMinutes < 0 || !Number.isInteger(taxiMinutes);
+      || taxiMinutes < 1 || !Number.isInteger(taxiMinutes);
     if (!Number.isFinite(pushback.getTime()) || invalidDuration) {
       estimatedDublin.textContent = 'Check the push back time and durations';
       estimatedDestination.textContent = 'Check the push back time and durations';
@@ -859,6 +865,12 @@ function renderFlightInformation() {
   form.addEventListener('input', () => {
     capPassengerCounts();
     updateFlightSummary();
+  });
+  content.querySelector('#use-current-pushback-time').addEventListener('click', () => {
+    const now = new Date();
+    const pad = value => String(value).padStart(2, '0');
+    form.elements.pushback.value = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    form.elements.pushback.dispatchEvent(new Event('input', { bubbles: true }));
   });
   window.addEventListener('pagehide', () => form.reset(), { once: true });
   updateFlightSummary();
