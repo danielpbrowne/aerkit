@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#142b3b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="AerKit">
+  <meta name="description" content="Cabin Service Manager reference for Aer Lingus long-haul operations.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/AerKit.png?v=aerkit-logo-20261120" type="image/png">
+  <link rel="apple-touch-icon" href="assets/AerKit.png?v=aerkit-logo-20261120">
+  <link rel="stylesheet" href="styles.css?v=aerkit-hero-logo-20261120">
+  <title>AerKit</title>
+</head>
+<body>
+  <header class="topbar" id="top">
+    <a class="brand" href="#home" aria-label="AerKit home"><img class="brand-logo" src="assets/AerKit.png?v=aerkit-logo-20261120" alt="AerKit logo"><span><strong>AerKit</strong><small id="information-updated">Info updated: 8 Nov 2026</small></span></a>
+    <div class="top-actions"><a class="home-button" href="#content-area" aria-label="Home: Flight Information"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></a><button class="icon-button" id="install-button" hidden>Install</button></div>
+  </header>
+  <main>
+    <section class="welcome" id="home">
+      <div class="welcome-copy"><p class="eyebrow">AerKit</p><p class="intro">North America</p></div>
+      <img class="welcome-logo" src="assets/AerKit.png?v=aerkit-logo-20261120" alt="AerKit logo">
+    </section>
+    <section class="search-wrap" aria-label="Search reference">
+      <label class="search-box"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search destinations, aircraft, flight info…" autocomplete="off"><kbd>⌘ K</kbd></label>
+      <div id="search-results" class="search-results" hidden></div>
+    </section>
+    <nav class="section-navigation" aria-label="Main sections">
+      <button class="section-menu-toggle" id="section-menu-toggle" type="button" aria-expanded="false" aria-controls="section-menu">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <span>Sections</span><strong id="current-section">Flight Information</strong><b aria-hidden="true">⌄</b>
+      </button>
+      <div class="quick-links" id="section-menu">
+        <button data-section="flightInfo" data-label="Flight Information"><span>01</span>Flight Information</button>
+        <button data-section="aircraft" data-label="Aircraft"><span>02</span>Aircraft</button>
+        <button data-section="destinations" data-label="Destinations"><span>03</span>Destinations</button>
+        <button data-section="flight" data-label="Flight &amp; Duty"><span>04</span>Flight &amp; Duty</button>
+        <button data-section="ife" data-label="IFE &amp; Wi-Fi"><span>05</span>IFE &amp; Wi-Fi</button>
+        <button data-section="crew" data-label="Credits &amp; Payments"><span>06</span>Credits &amp; Payments</button>
+        <button data-section="roster" data-label="Roster &amp; Bids"><span>07</span>Roster &amp; Bids</button>
+        <button data-section="contacts" data-label="Useful Contacts &amp; Links"><span>08</span>Useful Contacts &amp; Links</button>
+        <button data-section="feedback" data-label="Missing / Incorrect Information"><span>09</span>Missing / Incorrect Information</button>
+      </div>
+    </nav>
+    <section class="content-area" id="content-area" aria-live="polite"></section>
+    <footer><span>AERKIT</span></footer>
+  </main>
+  <script src="reference-data.js?v=aerkit-20261120"></script>
+  <script src="app.js?v=aerkit-20261120"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "name": "AerKit",
+  "short_name": "AerKit",
+  "description": "Long-haul cabin crew companion app",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f7f2",
+  "theme_color": "#142b3b",
+  "icons": [{"src":"assets/AerKit.png","sizes":"1254x1254","type":"image/png","purpose":"any maskable"}]
+}
