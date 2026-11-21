@@ -1,4 +1,5 @@
 const data = window.CSM_DATA;
+const FEEDBACK_FORMSPREE_ID = 'mwloreqe';
 const sections = {
   essentials: { title: 'Quick Access', desc: 'Quick access to the most frequently visited tools.' },
   destinations: { title: 'Destination Guide', desc: 'Select your destination from the list below to find Airport, Hotel & Transport Information' },
@@ -160,11 +161,11 @@ function renderFeedbackPage() {
     + `<article class="card feedback-card">
       <p>Choose what your feedback relates to, then describe the information that should be added or corrected.</p>
       <form id="feedback-form" class="feedback-form">
-        <label class="flight-field"><span>Feedback type</span><select id="feedback-category" required><option value="">Select a category</option><option>Airport Information</option><option>Outstation Contact Information</option><option>Hotel Information</option><option>Other</option><option>App Idea Suggestions</option></select></label>
-        <label class="flight-field" id="feedback-destination-wrap" hidden><span>Destination</span><select id="feedback-destination"><option value="">Select destination</option>${destinationOptions}</select></label>
-        <label class="flight-field feedback-detail-field"><span id="feedback-detail-label">Suggested Correction</span><textarea id="feedback-detail" rows="4" required placeholder="Describe the suggested correction"></textarea></label>
-        <label class="flight-field feedback-context-field"><span>Source or evidence (optional)</span><textarea id="feedback-context" rows="3" placeholder="Add a document name, link, date checked, or other evidence"></textarea></label>
-        <div class="feedback-actions"><button class="feedback-submit" type="submit">Save Feedback</button><button class="feedback-copy" type="button" id="feedback-copy" hidden>Copy report</button></div>
+        <label class="flight-field"><span>Feedback type</span><select id="feedback-category" name="category" required><option value="">Select a category</option><option>Airport Information</option><option>Outstation Contact Information</option><option>Hotel Information</option><option>Other</option><option>App Idea Suggestions</option></select></label>
+        <label class="flight-field" id="feedback-destination-wrap" hidden><span>Destination</span><select id="feedback-destination" name="destination"><option value="">Select destination</option>${destinationOptions}</select></label>
+        <label class="flight-field feedback-detail-field"><span id="feedback-detail-label">Suggested Correction</span><textarea id="feedback-detail" name="details" rows="4" required placeholder="Describe the suggested correction"></textarea></label>
+        <label class="flight-field feedback-context-field"><span>Source or evidence (optional)</span><textarea id="feedback-context" name="source_or_evidence" rows="3" placeholder="Add a document name, link, date checked, or other evidence"></textarea></label>
+        <div class="feedback-actions"><button class="feedback-submit" type="submit">Submit Feedback</button><button class="feedback-copy" type="button" id="feedback-copy" hidden>Copy report</button></div>
         <p id="feedback-status" class="feedback-status" role="status" aria-live="polite"></p>
       </form>
     </article>`;
@@ -180,6 +181,7 @@ function initFeedbackPage() {
   const detail = form.querySelector('#feedback-detail');
   const status = form.querySelector('#feedback-status');
   const copyButton = form.querySelector('#feedback-copy');
+  const submitButton = form.querySelector('.feedback-submit');
   let savedReport = '';
   const updateFields = () => {
     const selected = category.value;
@@ -193,7 +195,7 @@ function initFeedbackPage() {
   };
   category.addEventListener('change', updateFields);
   form.addEventListener('reset', () => setTimeout(updateFields));
-  form.addEventListener('submit', event => {
+  form.addEventListener('submit', async event => {
     event.preventDefault();
     const selected = category.value;
     const destinationName = !destinationWrap.hidden && destination.value ? destination.options[destination.selectedIndex].textContent : '';
@@ -206,9 +208,27 @@ function initFeedbackPage() {
       ...(extra ? [`Source or evidence: ${extra}`] : [])
     ];
     savedReport = lines.join('\n\n');
-    try { localStorage.setItem('aerkit-feedback-draft', savedReport); } catch {}
-    status.textContent = 'Feedback saved on this device. Copy the report if you want to share it.';
-    copyButton.hidden = false;
+    const payload = new FormData(form);
+    payload.set('message', savedReport);
+    payload.set('_subject', `AerKit feedback: ${selected}`);
+    submitButton.disabled = true;
+    status.textContent = 'Submitting feedback…';
+    try {
+      const response = await fetch(`https://formspree.io/f/${FEEDBACK_FORMSPREE_ID}`, {
+        method: 'POST',
+        body: payload,
+        headers: { Accept: 'application/json' }
+      });
+      if (!response.ok) throw new Error('Form submission failed');
+      status.textContent = 'Thank you. Your feedback has been submitted.';
+      copyButton.hidden = true;
+      form.reset();
+    } catch {
+      status.textContent = 'We could not submit your feedback. Please try again later or copy the report to keep it.';
+      copyButton.hidden = false;
+    } finally {
+      submitButton.disabled = false;
+    }
   });
   copyButton.addEventListener('click', async () => {
     try {
