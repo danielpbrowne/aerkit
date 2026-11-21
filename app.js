@@ -1,5 +1,4 @@
 const data = window.CSM_DATA;
-const FEEDBACK_FORMSPREE_ID = 'mwloreqe';
 const sections = {
   essentials: { title: 'Quick Access', desc: 'Quick access to the most frequently visited tools.' },
   destinations: { title: 'Destination Guide', desc: 'Select your destination from the list below to find Airport, Hotel & Transport Information' },
@@ -161,11 +160,11 @@ function renderFeedbackPage() {
     + `<article class="card feedback-card">
       <p>Choose what your feedback relates to, then describe the information that should be added or corrected.</p>
       <form id="feedback-form" class="feedback-form">
-        <label class="flight-field"><span>Feedback type</span><select id="feedback-category" name="category" required><option value="">Select a category</option><option>Airport Information</option><option>Outstation Contact Information</option><option>Hotel Information</option><option>Other</option><option>App Idea Suggestions</option></select></label>
-        <label class="flight-field" id="feedback-destination-wrap" hidden><span>Destination</span><select id="feedback-destination" name="destination"><option value="">Select destination</option>${destinationOptions}</select></label>
-        <label class="flight-field feedback-detail-field"><span id="feedback-detail-label">Suggested Correction</span><textarea id="feedback-detail" name="details" rows="4" required placeholder="Describe the suggested correction"></textarea></label>
-        <label class="flight-field feedback-context-field"><span>Source or evidence (optional)</span><textarea id="feedback-context" name="source_or_evidence" rows="3" placeholder="Add a document name, link, date checked, or other evidence"></textarea></label>
-        <div class="feedback-actions"><button class="feedback-submit" type="submit">Submit Feedback</button><button class="feedback-copy" type="button" id="feedback-copy" hidden>Copy report</button></div>
+        <label class="flight-field"><span>Feedback type</span><select id="feedback-category" required><option value="">Select a category</option><option>Airport Information</option><option>Outstation Contact Information</option><option>Hotel Information</option><option>Other</option><option>App Idea Suggestions</option></select></label>
+        <label class="flight-field" id="feedback-destination-wrap" hidden><span>Destination</span><select id="feedback-destination"><option value="">Select destination</option>${destinationOptions}</select></label>
+        <label class="flight-field feedback-detail-field"><span id="feedback-detail-label">Suggested Correction</span><textarea id="feedback-detail" rows="4" required placeholder="Describe the suggested correction"></textarea></label>
+        <label class="flight-field feedback-context-field"><span>Source or evidence (optional)</span><textarea id="feedback-context" rows="3" placeholder="Add a document name, link, date checked, or other evidence"></textarea></label>
+        <div class="feedback-actions"><button class="feedback-submit" type="submit">Save Feedback</button><button class="feedback-copy" type="button" id="feedback-copy" hidden>Copy report</button></div>
         <p id="feedback-status" class="feedback-status" role="status" aria-live="polite"></p>
       </form>
     </article>`;
@@ -181,7 +180,6 @@ function initFeedbackPage() {
   const detail = form.querySelector('#feedback-detail');
   const status = form.querySelector('#feedback-status');
   const copyButton = form.querySelector('#feedback-copy');
-  const submitButton = form.querySelector('.feedback-submit');
   let savedReport = '';
   const updateFields = () => {
     const selected = category.value;
@@ -195,12 +193,8 @@ function initFeedbackPage() {
   };
   category.addEventListener('change', updateFields);
   form.addEventListener('reset', () => setTimeout(updateFields));
-  form.addEventListener('submit', async event => {
+  form.addEventListener('submit', event => {
     event.preventDefault();
-    if (FEEDBACK_FORMSPREE_ID === 'YOUR_FORMSPREE_FORM_ID') {
-      status.textContent = 'This form is not connected yet. Add your Formspree form ID in app.js to enable submissions.';
-      return;
-    }
     const selected = category.value;
     const destinationName = !destinationWrap.hidden && destination.value ? destination.options[destination.selectedIndex].textContent : '';
     const extra = form.querySelector('#feedback-context').value.trim();
@@ -212,27 +206,9 @@ function initFeedbackPage() {
       ...(extra ? [`Source or evidence: ${extra}`] : [])
     ];
     savedReport = lines.join('\n\n');
-    const payload = new FormData(form);
-    payload.set('message', savedReport);
-    payload.set('_subject', `AerKit feedback: ${selected}`);
-    submitButton.disabled = true;
-    status.textContent = 'Submitting feedback…';
-    try {
-      const response = await fetch(`https://formspree.io/f/${encodeURIComponent(FEEDBACK_FORMSPREE_ID)}`, {
-        method: 'POST',
-        body: payload,
-        headers: { Accept: 'application/json' }
-      });
-      if (!response.ok) throw new Error('Form submission failed');
-      status.textContent = 'Thank you. Your feedback has been submitted.';
-      copyButton.hidden = true;
-      form.reset();
-    } catch {
-      status.textContent = 'We could not submit your feedback. Please try again later or copy the report to keep it.';
-      copyButton.hidden = false;
-    } finally {
-      submitButton.disabled = false;
-    }
+    try { localStorage.setItem('aerkit-feedback-draft', savedReport); } catch {}
+    status.textContent = 'Feedback saved on this device. Copy the report if you want to share it.';
+    copyButton.hidden = false;
   });
   copyButton.addEventListener('click', async () => {
     try {
@@ -416,12 +392,85 @@ const basicFdpRows = [
 
 function renderBasicFdpCard(card) {
   const reportOptions = basicFdpRows.map(([reportTime], index) => `<option value="${index}">${reportTime}</option>`).join('');
-  return `<article class="card fdp-card"><span class="card-tag">${escapeHtml(card[0])}</span><h3>${escapeHtml(card[1])}</h3><p>Pick your report-time band, then the number of sectors to be operated. This will calculate your <strong>basic</strong> maximum FDP allowable under EASA FTL's.</p><p class="fdp-acclim-prompt">Check Acclimatisation state below if you are starting your Duty away from your Home Base after 48hrs from your starting report time.</p><form class="acclim-checker" id="basic-fdp-checker"><label class="acclim-field"><span>Report time (reference time)</span><select name="reportTime" required><option value="">Select report-time band</option>${reportOptions}</select></label><label class="acclim-field"><span>Sectors operated</span><select name="sectors" required><option value="">Select sectors</option><option value="1">1–2 sectors</option><option value="2">3 sectors</option><option value="3">4 sectors</option></select></label><div class="acclim-actions"><button class="acclim-calculate" type="submit">Check maximum FDP</button><button class="acclim-reset" type="reset">Reset</button></div><div class="acclim-result fdp-basic-result" id="basic-fdp-result" role="status" aria-live="polite" hidden></div></form><p class="acclim-note">This is a basic FDP estimate. Ensure all collective agreements are also followed and applied where necessary.</p></article>`;
+  return `<article class="card fdp-card"><span class="card-tag">${escapeHtml(card[0])}</span><h3>${escapeHtml(card[1])}</h3>
+    <p>Pick your report-time band, then the number of sectors to be operated. This will calculate your <strong>basic</strong> maximum FDP allowable under EASA FTL's.</p>
+    <p class="fdp-acclim-prompt">Check Acclimatisation state below if you are starting your Duty away from your Home Base after 48hrs from your starting report time.</p>
+    <form class="acclim-checker" id="basic-fdp-checker">
+      <label class="acclim-field"><span>Report time (reference time)</span><select name="reportTime" required><option value="">Select report-time band</option>${reportOptions}</select></label>
+      <label class="acclim-field"><span>Sectors operated</span><select name="sectors" required><option value="">Select sectors</option><option value="1">1–2 sectors</option><option value="2">3 sectors</option><option value="3">4 sectors</option></select></label>
+      <label class="acclim-field inflight-rest-question"><span>Will this duty use an FDP extension with in-flight rest?</span><select name="inflightRest" required><option value="">Select yes or no</option><option value="no">No</option><option value="yes">Yes</option></select></label>
+      <div class="inflight-rest-details" hidden>
+        <label class="acclim-field"><span>In-flight rest facility class</span><select name="restClass"><option value="">Select rest class</option><option value="1">Class 1</option><option value="2">Class 2</option><option value="3">Class 3</option></select></label>
+        <label class="acclim-field"><span>Additional flight crew</span><select name="additionalCrew"><option value="">Select additional crew</option><option value="1">1 additional flight crew member</option><option value="2">2 additional flight crew members</option></select></label>
+        <p class="inflight-rest-facility-note"><strong>Class 1:</strong> a bunk or near-flat bed in a separate crew rest area.</p>
+        <p class="inflight-rest-facility-note"><strong>Class 2:</strong> a seat reclining at least 45°, with at least 55 inches of pitch, 20 inches of width, leg and foot support, and separation from passengers.</p>
+        <p class="inflight-rest-facility-note"><strong>Class 3:</strong> a seat reclining at least 40°, with leg and foot support, separation from passengers, and no passenger in an adjacent seat.</p>
+        <label class="acclim-field inflight-rest-long-sector" hidden><span>Does the duty include one sector over 9 hours of continuous flight time?</span><select name="longSector"><option value="">Select yes or no</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <p class="inflight-rest-unavailable" hidden>EASA allows in-flight-rest FDP extensions for no more than 3 sectors.</p>
+        <p class="inflight-rest-guidance">A qualifying sector over 9 hours may add 1 hour when there are no more than 2 sectors. In-flight rest counts as FDP. Every crew member must receive the required rest; the flight crew member at the controls during landing needs 2 consecutive hours. The minimum rest at destination is the preceding duty period or 14 hours, whichever is greater. This extension cannot be combined with an extension without in-flight rest or split duty. Confirm the route and rest allocation against your operator’s approved FTL scheme (ORO.FTL.205(e) and CS FTL.1.205(c)).</p>
+      </div>
+      <div class="acclim-actions"><button class="acclim-calculate" type="submit">Check maximum FDP</button><button class="acclim-reset" type="reset">Reset</button></div>
+      <div class="acclim-result fdp-basic-result" id="basic-fdp-result" role="status" aria-live="polite" hidden></div>
+    </form>
+    <p class="acclim-note">This is a basic FDP estimate. Ensure all collective agreements are also followed and applied where necessary.</p>
+  </article>`;
 }
 
 function renderAcclimatisationCard(card) {
   return `<article class="card fdp-card"><span class="card-tag">${escapeHtml(card[0])}</span><h3>${escapeHtml(card[1])}</h3><p>If you report for duty in Ireland, you are assumed to be acclimatised to Home Base time. Your acclimatisation state at your next outstation report depends on the time elapsed since your Home Base report and the time difference at the outstation.</p><form class="acclim-checker" id="acclim-checker"><label class="acclim-field"><span>Time Difference between Home Base &amp; Next Report Location</span><select name="difference" required><option value="">Select time difference</option><option value="0">Less than 4 hours</option><option value="1">4 to 6 hours</option><option value="2">More than 6 to 9 hours</option><option value="3">More than 9 to 12 hours</option></select></label><label class="acclim-field"><span>Time from Home Base Report until next report time</span><select name="elapsed" required><option value="">Select elapsed time</option><option value="0">Less than 48 hours</option><option value="1">48 to 71 hours 59 minutes</option><option value="2">72 to 95 hours 59 minutes</option><option value="3">96 to 119 hours 59 minutes</option><option value="4">120 hours or more</option></select></label><div class="acclim-actions"><button class="acclim-calculate" type="submit">Check acclimatisation</button><button class="acclim-reset" type="reset">Reset</button></div><div class="acclim-result" id="acclim-result" role="status" aria-live="polite" hidden></div></form><p class="acclim-note">This checker uses the information from EASA ORO.FTL.105 Definitions.</p></article>`;
 }
+
+function formatFdpMinutes(minutes) {
+  return `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, '0')}`;
+}
+
+function parseFdpMinutes(value) {
+  const [hours, minutes] = value.split(':').map(Number);
+  return hours * 60 + minutes;
+}
+
+function minimumCabinCrewRest(maximumFdpMinutes, restClass) {
+  const rows = [
+    [870, [90, 90, 90]],
+    [900, [105, 120, 140]],
+    [930, [120, 140, 160]],
+    [960, [135, 160, 180]],
+    [990, [155, 180, null]],
+    [1020, [180, 205, null]],
+    [1050, [205, null, null]],
+    [1080, [230, null, null]]
+  ];
+  const row = rows.find(([limit]) => maximumFdpMinutes <= limit);
+  return row ? row[1][restClass - 1] : null;
+}
+
+function updateBasicFdpRestFields(form) {
+  const enabled = form.elements.inflightRest.value === 'yes';
+  const sectors = form.elements.sectors.value;
+  const eligibleSectorCount = sectors !== '3';
+  const details = form.querySelector('.inflight-rest-details');
+  const unavailable = form.querySelector('.inflight-rest-unavailable');
+  const longSectorField = form.querySelector('.inflight-rest-long-sector');
+  const restClass = form.elements.restClass;
+  const additionalCrew = form.elements.additionalCrew;
+  const longSector = form.elements.longSector;
+
+  details.hidden = !enabled;
+  unavailable.hidden = !enabled || eligibleSectorCount;
+  longSectorField.hidden = !enabled || sectors !== '1';
+  restClass.required = enabled && eligibleSectorCount;
+  additionalCrew.required = enabled && eligibleSectorCount;
+  longSector.required = enabled && sectors === '1';
+}
+
+content.addEventListener('change', event => {
+  const form = event.target.closest('#basic-fdp-checker');
+  if (!form) return;
+  updateBasicFdpRestFields(form);
+  const result = form.querySelector('#basic-fdp-result');
+  result.hidden = true;
+  result.innerHTML = '';
+});
 
 content.addEventListener('submit', event => {
   if (event.target.id === 'basic-fdp-checker') {
@@ -429,9 +478,36 @@ content.addEventListener('submit', event => {
     const reportTime = event.target.elements.reportTime.value;
     const sectors = event.target.elements.sectors.value;
     const result = event.target.querySelector('#basic-fdp-result');
+    const form = event.target;
     if (reportTime === '' || sectors === '') return;
-    const maximumFdp = basicFdpRows[Number(reportTime)][Number(sectors)];
-    result.innerHTML = `<div class="acclim-result-copy"><strong>Maximum Basic FDP</strong><p class="fdp-basic-result-time">${maximumFdp}</p><p>Based on report-time band ${escapeHtml(event.target.elements.reportTime.selectedOptions[0].textContent)} and ${escapeHtml(event.target.elements.sectors.selectedOptions[0].textContent)}. Reference time zone follows the crew member’s acclimatisation state.</p></div>`;
+    const maximumBasicMinutes = parseFdpMinutes(basicFdpRows[Number(reportTime)][Number(sectors)]);
+    const usesInflightRest = form.elements.inflightRest.value === 'yes';
+
+    if (usesInflightRest && sectors === '3') {
+      result.innerHTML = '<div class="acclim-result-copy"><strong>In-flight rest extension unavailable</strong><p>EASA limits this extension to a maximum of 3 sectors. Select 1–2 or 3 sectors to calculate it.</p></div>';
+      result.hidden = false;
+      return;
+    }
+
+    if (usesInflightRest) {
+      const restClass = Number(form.elements.restClass.value);
+      const additionalCrew = Number(form.elements.additionalCrew.value);
+      const qualifiesForExtraHour = sectors === '1' && form.elements.longSector.value === 'yes';
+      const baseCapByCrew = {
+        1: { 1: 960, 2: 900, 3: 840 },
+        2: { 1: 1020, 2: 960, 3: 900 }
+      };
+      const maximumExtendedMinutes = baseCapByCrew[additionalCrew][restClass] + (qualifiesForExtraHour ? 60 : 0);
+      const requiredCabinCrewRest = minimumCabinCrewRest(maximumExtendedMinutes, restClass);
+      const increaseMinutes = maximumExtendedMinutes - maximumBasicMinutes;
+      const longSectorNote = qualifiesForExtraHour ? ' The qualifying long sector adds 1 hour to the limit.' : '';
+      const basicComparison = increaseMinutes > 0 ? `This is up to ${formatFdpMinutes(increaseMinutes)} above your basic maximum of ${formatFdpMinutes(maximumBasicMinutes)}.` : `Your basic maximum is ${formatFdpMinutes(maximumBasicMinutes)}.`;
+      result.innerHTML = `<div class="acclim-result-copy"><strong>Maximum FDP with in-flight rest</strong><p class="fdp-basic-result-time">${formatFdpMinutes(maximumExtendedMinutes)}</p><p>Minimum in-flight rest for each cabin crew member, for an FDP up to this limit: <strong>${formatFdpMinutes(requiredCabinCrewRest)}</strong>.</p><p>${basicComparison}${longSectorNote} In-flight rest counts as FDP.</p><p>Based on Class ${restClass} facilities and ${additionalCrew} additional flight crew member${additionalCrew === 1 ? '' : 's'}.</p></div>`;
+      result.hidden = false;
+      return;
+    }
+
+    result.innerHTML = `<div class="acclim-result-copy"><strong>Maximum Basic FDP</strong><p class="fdp-basic-result-time">${formatFdpMinutes(maximumBasicMinutes)}</p><p>Based on report-time band ${escapeHtml(form.elements.reportTime.selectedOptions[0].textContent)} and ${escapeHtml(form.elements.sectors.selectedOptions[0].textContent)}. Reference time zone follows the crew member’s acclimatisation state.</p></div>`;
     result.hidden = false;
     return;
   }
@@ -457,10 +533,18 @@ content.addEventListener('submit', event => {
 });
 content.addEventListener('reset', event => {
   if (!['acclim-checker', 'basic-fdp-checker'].includes(event.target.id)) return;
-  const result = event.target.querySelector(event.target.id === 'acclim-checker' ? '#acclim-result' : event.target.id === 'basic-fdp-checker' ? '#basic-fdp-result' : '#duty-time-result');
+  const result = event.target.querySelector(event.target.id === 'acclim-checker' ? '#acclim-result' : '#basic-fdp-result');
   result.hidden = true;
   delete result.dataset.state;
   result.textContent = '';
+  if (event.target.id === 'basic-fdp-checker') {
+    event.target.querySelector('.inflight-rest-details').hidden = true;
+    event.target.elements.restClass.required = false;
+    event.target.elements.additionalCrew.required = false;
+    event.target.elements.longSector.required = false;
+    event.target.querySelector('.inflight-rest-unavailable').hidden = true;
+    event.target.querySelector('.inflight-rest-long-sector').hidden = true;
+  }
 });
 content.addEventListener('input', event => {
   if (['ninth-report-time', 'ninth-pushback-time', 'ninth-flight-hours', 'ninth-flight-minutes', 'ninth-extra-info'].includes(event.target.id)) updateNinthCrewEstimate();
