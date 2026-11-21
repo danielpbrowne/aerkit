@@ -17,7 +17,7 @@
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--canvas);color:var(--ink);font:19px/1.55 Urbanist,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-.topbar{height:76px;padding:0 max(5vw,24px);display:flex;align-items:center;justify-content:space-between;background:var(--navy-deep);border-bottom:1px solid #314957;color:#f7f7f2}
+.topbar{height:76px;padding:0 max(5vw,24px);display:flex;align-items:center;justify-content:space-between;background:var(--navy);border-bottom:1px solid #344c5d;color:#f7f7f2}
 .brand{display:flex;gap:12px;align-items:center;color:inherit;text-decoration:none}
 .brand-logo{width:42px;height:42px;object-fit:contain;flex:0 0 auto}
 .brand strong{display:block;font-size:17px;letter-spacing:.1px}
@@ -28,11 +28,13 @@ body{margin:0;background:var(--canvas);color:var(--ink);font:19px/1.55 Urbanist,
 .home-button{display:inline-flex;min-height:40px;align-items:center;gap:7px;padding:7px 13px;border:1px solid #697a82;border-radius:20px;color:#f7f7f2;text-decoration:none;font:600 14px Urbanist,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 .home-button:hover{background:#294354}.home-button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 main{max-width:1120px;margin:auto;padding:0 30px}
-.welcome{position:relative;display:flex;min-height:180px;margin-top:35px;background:var(--navy);overflow:hidden;border-radius:8px;color:#f8f8f3;padding:30px 54px;align-items:center;box-shadow:var(--shadow)}
-.welcome-copy{position:relative;z-index:1;max-width:490px}
+.welcome{position:relative;display:flex;gap:24px;min-height:200px;margin-top:35px;background:var(--navy);overflow:hidden;border-radius:8px;color:#f8f8f3;padding:30px 54px;align-items:center;box-shadow:var(--shadow)}
+.welcome-logo{position:relative;z-index:1;width:123px;height:123px;flex:0 0 auto;object-fit:contain;border-radius:12px}
+.welcome-copy{position:relative;z-index:1;max-width:590px}
 .eyebrow,.section-kicker{font:13px ui-monospace,SFMono-Regular,monospace;letter-spacing:.12em;color:#e3c66d}
-.welcome-copy>.eyebrow{font:700 22px/1.18 Outfit,Urbanist,sans-serif;letter-spacing:.01em;color:#e3c66d;text-transform:none}
-.intro{font-size:18px;color:#d5dedf;max-width:410px;margin:17px 0 0}
+.welcome-copy>.eyebrow{font:700 clamp(32px,4vw,42px)/1.08 Outfit,Urbanist,sans-serif;letter-spacing:.01em;color:#e3c66d;text-transform:none;margin:0}
+.intro{font-size:18px;color:#d5dedf;max-width:440px;margin:12px 0 0}
+.welcome-region{display:block;font-size:80%;font-weight:700;line-height:1.25;margin-top:3px}
 .welcome-art{position:absolute;right:5%;top:0;width:40%;height:100%;opacity:.95}
 .sun{position:absolute;width:172px;height:172px;border:1px solid #d6c17445;border-radius:50%;top:48px;right:27px;background:radial-gradient(circle,#d8c57a12 0 55%,transparent 56%)}
 .route-line{position:absolute;width:270px;height:145px;border:1px solid #bbc8c160;border-color:#bbc8c160 transparent transparent transparent;border-radius:50%;transform:rotate(-18deg);top:102px;right:-12px}
@@ -141,8 +143,8 @@ main{max-width:1120px;margin:auto;padding:0 30px}
 .aircraft-rest-status.is-yes{background:#e6f1e2;color:#397b35}
 .aircraft-rest-status.is-no{background:#f9e4e2;color:#b13c39}
 footer{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:26px 0 35px;margin-top:37px;border-top:1px solid #d2dadd;font:12px ui-monospace,SFMono-Regular,monospace;letter-spacing:.06em;color:#76858a}
-@media(max-width:760px){main{padding:0 17px}.topbar{height:66px;padding:0 17px}.welcome{min-height:170px;margin-top:18px;padding:26px 26px}.welcome-art{width:45%;right:-9%;opacity:.55}.welcome-copy{max-width:420px}.card-grid,.destination-list{grid-template-columns:repeat(2,1fr)}.section-head{display:block}.section-head p{margin-top:6px}footer{gap:12px;flex-wrap:wrap}}
-@media(max-width:480px){.welcome{padding:24px 22px;min-height:155px}.intro{max-width:260px;font-size:17px}.welcome-art{right:-28%;width:65%;opacity:.36}.search-box{height:50px}.search-box kbd{display:none}.card-grid,.destination-list,.detail-layout{grid-template-columns:1fr}.icon-button{padding:7px 10px}}
+@media(max-width:760px){main{padding:0 17px}.topbar{height:66px;padding:0 17px}.welcome{gap:18px;min-height:170px;margin-top:18px;padding:26px}.welcome-logo{width:97px;height:97px;border-radius:9px}.welcome-art{width:45%;right:-9%;opacity:.55}.welcome-copy{max-width:420px}.card-grid,.destination-list{grid-template-columns:repeat(2,1fr)}.section-head{display:block}.section-head p{margin-top:6px}footer{gap:12px;flex-wrap:wrap}}
+@media(max-width:480px){.welcome{gap:14px;padding:24px 18px;min-height:155px}.welcome-logo{width:73px;height:73px;border-radius:7px}.welcome-copy>.eyebrow{font-size:clamp(28px,8vw,34px)}.intro{max-width:260px;font-size:16px;line-height:1.35;margin-top:8px}.welcome-art{right:-28%;width:65%;opacity:.36}.search-box{height:50px}.search-box kbd{display:none}.card-grid,.destination-list,.detail-layout{grid-template-columns:1fr}.icon-button{padding:7px 10px}}
 @media(max-width:600px){
   html{scroll-padding-top:82px}
   body{overflow-x:hidden;-webkit-text-size-adjust:100%}
