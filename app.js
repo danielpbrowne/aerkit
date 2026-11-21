@@ -109,6 +109,13 @@ const destinationAirportCoordinates = {
   SEA: [47.4502, -122.3088], YYZ: [43.6777, -79.6248], IAD: [38.9531, -77.4565]
 };
 const destinationWeatherCache = new Map();
+const metarStationIds = {
+  DUB: 'EIDW', BOS: 'KBOS', CUN: 'MMUN', ORD: 'KORD', CLE: 'KCLE', BDL: 'KBDL', IND: 'KIND',
+  LAX: 'KLAX', MIA: 'KMIA', BNA: 'KBNA', JFK: 'KJFK', EWR: 'KEWR', MCO: 'KMCO', PHL: 'KPHL',
+  PIT: 'KPIT', RDU: 'KRDU', SFO: 'KSFO', SEA: 'KSEA', YYZ: 'CYYZ', IAD: 'KIAD'
+};
+const flightWeatherCache = new Map();
+let flightWeatherRequestId = 0;
 
 function setActive(id) {
   document.querySelectorAll('.quick-links button').forEach(button => {
@@ -853,6 +860,15 @@ function renderFlightInformation() {
             <label class="flight-field"><span>Flight notes</span><textarea name="flightInformation" rows="3" placeholder="Add operational notes such as weather, turbulence, delays or other items to brief the crew."></textarea></label>
           </div>
         </section>
+        <section class="flight-panel flight-weather-panel" aria-labelledby="flight-weather-title">
+          <div class="flight-panel-head flight-weather-head"><div><span class="card-tag">CURRENT OBSERVATIONS</span><h3 id="flight-weather-title">Airport Weather</h3></div><button class="weather-refresh-button" type="button" id="refresh-flight-weather">Refresh</button></div>
+          <p class="flight-weather-intro">Latest reported airport conditions, translated into plain English. These are current observations, not a forecast.</p>
+          <div class="flight-weather-grid">
+            <article class="flight-weather-card"><h4 id="flight-weather-origin-title">Origin</h4><div id="flight-weather-origin" class="flight-weather-details">Select a route to load weather.</div></article>
+            <article class="flight-weather-card"><h4 id="flight-weather-destination-title">Destination</h4><div id="flight-weather-destination" class="flight-weather-details">Select a route to load weather.</div></article>
+          </div>
+          <p id="flight-weather-status" class="flight-weather-status" role="status" aria-live="polite">Weather is supplied by the <a href="https://aviationweather.gov/data/api/" target="_blank" rel="noopener">Aviation Weather Center</a>.</p>
+        </section>
       </div>
       <div class="flight-form-footer"><small id="flight-save-status" role="status">Entries stay in this page only and are cleared when you leave. PRMs are recorded separately and are not included in passenger total.</small><div class="flight-footer-actions"><button class="clear-flight-button" type="button" id="show-flight-snapshot">Flight Snapshot</button><button class="clear-flight-button" type="button" id="clear-flight-information">Clear Flight Information</button></div></div>
     </form>
@@ -956,6 +972,10 @@ function renderFlightInformation() {
   };
   form.addEventListener('input', handleFlightInput);
   form.addEventListener('change', handleFlightInput);
+  form.addEventListener('change', event => {
+    if (['destination', 'originAirport'].includes(event.target.name)) updateFlightWeather();
+  });
+  content.querySelector('#refresh-flight-weather').addEventListener('click', () => updateFlightWeather({ force: true }));
   content.querySelector('#use-current-pushback-time').addEventListener('click', () => {
     const selectedZone = form.elements.destination.value === 'DUB'
       ? destinationTimeZones[form.elements.originAirport.value]
@@ -970,11 +990,13 @@ function renderFlightInformation() {
   });
   window.addEventListener('pagehide', () => form.reset(), { once: true });
   updateFlightSummary();
+  updateFlightWeather();
 
   content.querySelector('#clear-flight-information').addEventListener('click', () => {
     form.reset();
     saveStatus.textContent = 'Flight information cleared from this page.';
     updateFlightSummary();
+    updateFlightWeather();
   });
   content.querySelector('#show-flight-snapshot').addEventListener('click', () => {
     const values = Object.fromEntries(new FormData(form).entries());
@@ -1022,6 +1044,179 @@ function formatFlightTime(date, timeZone) {
   }).formatToParts(date);
   const part = type => parts.find(item => item.type === type)?.value || '';
   return `${part('hour')}:${part('minute')} ${part('timeZoneName')} | ${part('day')}-${part('month')}`;
+}
+
+async function updateFlightWeather({ force = false } = {}) {
+  const form = document.querySelector('#flight-information-form');
+  const panel = document.querySelector('.flight-weather-panel');
+  if (!form || !panel) return;
+  const requestId = ++flightWeatherRequestId;
+  const destinationCode = form.elements.destination.value;
+  const isDublinDestination = destinationCode === 'DUB';
+  const originCode = isDublinDestination ? form.elements.originAirport.value : 'DUB';
+  const arrivalCode = destinationCode;
+  const origin = getFlightAirport(originCode);
+  const destination = getFlightAirport(arrivalCode);
+  const originTitle = panel.querySelector('#flight-weather-origin-title');
+  const destinationTitle = panel.querySelector('#flight-weather-destination-title');
+  const originOutput = panel.querySelector('#flight-weather-origin');
+  const destinationOutput = panel.querySelector('#flight-weather-destination');
+  const status = panel.querySelector('#flight-weather-status');
+
+  originTitle.textContent = origin ? `Origin · ${origin.name}` : 'Origin';
+  destinationTitle.textContent = destination ? `Destination · ${destination.name}` : 'Destination';
+  originOutput.textContent = destinationCode ? 'Loading latest observation…' : 'Select a route to load weather.';
+  destinationOutput.textContent = destinationCode ? 'Loading latest observation…' : 'Select a route to load weather.';
+
+  if (!destinationCode) {
+    status.innerHTML = 'Weather is supplied by the <a href="https://aviationweather.gov/data/api/" target="_blank" rel="noopener">Aviation Weather Center</a>.';
+    return;
+  }
+  if (!originCode) {
+    originOutput.textContent = 'Select an origin airport to load its weather.';
+    destinationOutput.textContent = 'Select an origin airport to load destination weather.';
+    status.textContent = 'Choose the origin airport to show conditions at both ends of the route.';
+    return;
+  }
+
+  const airports = [
+    { role: 'origin', airport: origin },
+    { role: 'destination', airport: destination }
+  ].filter(item => item.airport);
+  const missingStations = airports.filter(({ airport }) => !metarStationIds[airport.code]);
+  if (missingStations.length) {
+    status.textContent = `Weather station lookup is unavailable for ${missingStations.map(item => item.airport.name).join(', ')}.`;
+    return;
+  }
+
+  status.innerHTML = 'Weather is supplied by the <a href="https://aviationweather.gov/data/api/" target="_blank" rel="noopener">Aviation Weather Center</a>.';
+  const cacheDuration = 10 * 60 * 1000;
+  const stationsToFetch = airports.filter(({ airport }) => {
+    const cached = flightWeatherCache.get(airport.code);
+    return force || !cached || Date.now() - cached.time >= cacheDuration;
+  });
+
+  try {
+    if (stationsToFetch.length) {
+      const ids = stationsToFetch.map(({ airport }) => metarStationIds[airport.code]);
+      const response = await fetch(`/api/metar?ids=${encodeURIComponent(ids.join(','))}`);
+      if (!response.ok) throw new Error('Weather request failed');
+      const result = await response.json();
+      const observations = Array.isArray(result.observations) ? result.observations : [];
+      const byStation = new Map(observations.map(item => [String(item.icaoId || '').toUpperCase(), item]));
+      stationsToFetch.forEach(({ airport }) => {
+        const icaoId = metarStationIds[airport.code];
+        flightWeatherCache.set(airport.code, { time: Date.now(), observation: byStation.get(icaoId) || null });
+      });
+    }
+    if (requestId !== flightWeatherRequestId) return;
+
+    const render = ({ role, airport }) => {
+      const output = role === 'origin' ? originOutput : destinationOutput;
+      const observation = flightWeatherCache.get(airport.code)?.observation;
+      output.innerHTML = observation
+        ? renderFlightWeatherObservation(observation, destinationTimeZones[airport.code] || 'UTC')
+        : '<p class="flight-weather-unavailable">No recent airport observation is available.</p>';
+    };
+    airports.forEach(render);
+    const unavailable = airports.filter(({ airport }) => !flightWeatherCache.get(airport.code)?.observation);
+    status.innerHTML = unavailable.length
+      ? `${unavailable.map(({ airport }) => `${escapeHtml(airport.name)} has no recent observation. `).join('')}Source: <a href="https://aviationweather.gov/data/api/" target="_blank" rel="noopener">Aviation Weather Center</a>.`
+      : 'Current airport observations · source: <a href="https://aviationweather.gov/data/api/" target="_blank" rel="noopener">Aviation Weather Center</a>.';
+  } catch {
+    if (requestId !== flightWeatherRequestId) return;
+    originOutput.textContent = 'Weather is temporarily unavailable.';
+    destinationOutput.textContent = 'Weather is temporarily unavailable.';
+    status.textContent = navigator.onLine === false
+      ? 'Connect to the internet to load airport weather.'
+      : 'Weather could not be loaded. You can try again using Refresh.';
+  }
+}
+
+function getFlightAirport(code) {
+  if (code === 'DUB') return { code: 'DUB', name: 'Dublin' };
+  return data.destinations.find(item => item.code === code) || null;
+}
+
+function renderFlightWeatherObservation(observation, timeZone) {
+  const weather = String(observation.weather || '').toUpperCase().trim();
+  const phenomena = [
+    ['TS', 'Thunderstorms'], ['SH', 'Showers'], ['FZ', 'Freezing conditions'], ['RA', 'Rain'],
+    ['DZ', 'Drizzle'], ['SN', 'Snow'], ['PL', 'Ice pellets'], ['GR', 'Hail'], ['GS', 'Small hail'],
+    ['FG', 'Fog'], ['BR', 'Mist'], ['HZ', 'Haze'], ['FU', 'Smoke'], ['DU', 'Dust'], ['SA', 'Sand'], ['SQ', 'Squalls']
+  ];
+  const conditions = phenomena.filter(([code]) => weather.includes(code)).map(([, description]) => description);
+  let condition = conditions.length ? conditions.join(' and ') : describeCloudCover(observation.cloudCover);
+  if (weather.startsWith('+') && conditions.length) condition = `Heavy ${condition.toLowerCase()}`;
+  else if (weather.startsWith('-') && conditions.length) condition = `Light ${condition.toLowerCase()}`;
+  if (!condition) condition = 'No significant weather reported';
+
+  const details = [];
+  const temperature = observation.temperatureC === null || observation.temperatureC === undefined || observation.temperatureC === ''
+    ? NaN : Number(observation.temperatureC);
+  if (Number.isFinite(temperature) && temperature > -100 && temperature < 70) details.push(['Temperature', `${Math.round(temperature)}°C`]);
+
+  const windSpeed = observation.windSpeedKt === null || observation.windSpeedKt === undefined || observation.windSpeedKt === ''
+    ? NaN : Number(observation.windSpeedKt);
+  if (Number.isFinite(windSpeed) && windSpeed >= 0 && windSpeed < 250) {
+    const direction = describeWindDirection(observation.windDirection);
+    const speed = windSpeed <= 1 ? 'Calm' : `${Math.round(windSpeed * 1.852)} km/h`;
+    const gust = Number(observation.windGustKt);
+    const gustText = Number.isFinite(gust) && gust > windSpeed ? `, gusting to ${Math.round(gust * 1.852)} km/h` : '';
+    details.push(['Wind', `${windSpeed <= 1 ? '' : direction ? `${direction} at ` : ''}${speed}${gustText}`]);
+  }
+
+  const visibility = formatVisibility(observation.visibilityMiles);
+  if (visibility) details.push(['Visibility', visibility]);
+  const clouds = describeCloudLayers(observation.clouds, observation.cloudCover);
+  if (clouds) details.push(['Clouds', clouds]);
+
+  const timestamp = observation.reportTime ? new Date(observation.reportTime) : new Date(Number(observation.obsTime) * 1000);
+  const validTimestamp = Number.isFinite(timestamp.getTime());
+  const observed = validTimestamp
+    ? new Intl.DateTimeFormat('en-IE', { timeZone, hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short', hourCycle: 'h23' }).format(timestamp)
+    : '';
+  if (observed) details.push(['Observed', `${observed} local time`]);
+  const ageMinutes = validTimestamp ? Math.max(0, Math.round((Date.now() - timestamp.getTime()) / 60_000)) : null;
+  const staleNote = ageMinutes !== null && ageMinutes > 90
+    ? `<p class="flight-weather-stale">This observation is about ${Math.floor(ageMinutes / 60)}h ${ageMinutes % 60}m old.</p>`
+    : '';
+  return `<p class="flight-weather-condition">${escapeHtml(condition)}</p><dl>${details.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join('')}</dl>${staleNote}`;
+}
+
+function describeCloudCover(value) {
+  const names = { CLR: 'Clear skies', SKC: 'Clear skies', NCD: 'No clouds reported', NSC: 'No significant clouds', FEW: 'A few clouds', SCT: 'Scattered clouds', BKN: 'Broken cloud cover', OVC: 'Overcast', VV: 'Vertical visibility limited' };
+  const code = String(value || '').toUpperCase();
+  return names[code] || '';
+}
+
+function describeCloudLayers(layers, cover) {
+  if (!Array.isArray(layers) || !layers.length) return describeCloudCover(cover);
+  const names = { CLR: 'clear', SKC: 'clear', NCD: 'no clouds reported', NSC: 'no significant clouds', FEW: 'a few clouds', SCT: 'scattered', BKN: 'broken', OVC: 'overcast', VV: 'vertical visibility limited' };
+  const described = layers.map(layer => {
+    const name = names[String(layer.cover || '').toUpperCase()];
+    if (!name) return '';
+    const base = Number(layer.base);
+    return `${name}${Number.isFinite(base) && base > 0 ? ` at ${base.toLocaleString('en-IE')} ft` : ''}`;
+  }).filter(Boolean);
+  return [...new Set(described)].join('; ') || describeCloudCover(cover);
+}
+
+function describeWindDirection(value) {
+  if (typeof value === 'string' && /^(VRB|VAR)$/i.test(value)) return 'Variable direction';
+  if (value === null || value === undefined || value === '') return '';
+  const degrees = Number(value);
+  if (!Number.isFinite(degrees) || degrees < 0) return '';
+  const compass = ['north', 'north-northeast', 'northeast', 'east-northeast', 'east', 'east-southeast', 'southeast', 'south-southeast', 'south', 'south-southwest', 'southwest', 'west-southwest', 'west', 'west-northwest', 'northwest', 'north-northwest'];
+  return `From the ${compass[Math.round(degrees / 22.5) % 16]}`;
+}
+
+function formatVisibility(value) {
+  if (value === undefined || value === null || value === '') return '';
+  const raw = String(value).trim().replace(/SM$/i, '');
+  const fraction = /^(\d+)\/(\d+)$/.exec(raw);
+  if (fraction) return `${(Number(fraction[1]) / Number(fraction[2])).toFixed(1)} miles`;
+  return `${raw} miles`;
 }
 
 function wallTimeToDate(value, timeZone) {
