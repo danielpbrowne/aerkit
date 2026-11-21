@@ -748,8 +748,8 @@ function renderAircraft() {
       const visualShare = name === 'Business' ? 25 : (nonBusinessSeats ? 75 * seats / nonBusinessSeats : 75);
       return `<div class="seat-zone${name === 'Business' ? ' seat-zone-business' : ''}" style="--zone:${visualShare.toFixed(2)}%"><strong>${seats}</strong></div>`;
     }).join('');
-    const registrations = aircraft.registrations.join(', ');
-    return `<article class="card aircraft-card" id="${aircraftId(aircraft)}"><div class="aircraft-card-head"><span class="card-tag">${escapeHtml(aircraft.type)}</span><strong class="aircraft-total">${aircraft.total}<small> seats</small></strong></div><div class="seat-bar" aria-label="Approximate cabin class visual; exact seat counts are listed below">${bar}</div><div class="seat-legend">${zones.map(([name, seats]) => `<span>${escapeHtml(name)} <b>${seats}</b></span>`).join('')}</div><div class="aircraft-stats"><div><span>CABIN CREW SEATS</span><strong>${aircraft.cabinCrewSeats}</strong></div><div><span>FLIGHT DECK REST</span>${renderRestStatus(aircraft.flightDeckRest)}</div><div><span>CABIN CREW REST</span>${renderRestStatus(aircraft.cabinCrewRest)}</div></div><div class="registration-list"><span>REGISTRATIONS</span><p>${escapeHtml(registrations)}</p></div></article>`;
+    const registrations = aircraft.registrations.map(registration => `<li>${escapeHtml(registration)}</li>`).join('');
+    return `<article class="card aircraft-card" id="${aircraftId(aircraft)}"><div class="aircraft-card-head"><span class="card-tag">${escapeHtml(aircraft.type)}</span><strong class="aircraft-total">${aircraft.total}<small> seats</small></strong></div><div class="seat-bar" aria-label="Approximate cabin class visual; exact seat counts are listed below">${bar}</div><div class="seat-legend">${zones.map(([name, seats]) => `<span>${escapeHtml(name)} <b>${seats}</b></span>`).join('')}</div><div class="aircraft-stats"><div><span>CABIN CREW SEATS</span><strong>${aircraft.cabinCrewSeats}</strong></div><div><span>FLIGHT DECK REST</span>${renderRestStatus(aircraft.flightDeckRest)}</div><div><span>CABIN CREW REST</span>${renderRestStatus(aircraft.cabinCrewRest)}</div></div><details class="registration-list"><summary>Registrations</summary><ul>${registrations}</ul></details></article>`;
   }).join('');
   content.innerHTML = heading('FLEET QUICK REFERENCE', sections.aircraft.title, sections.aircraft.desc)
     + `<div class="card-grid aircraft-grid">${cards}</div>`;
@@ -782,12 +782,11 @@ function renderFlightInformation() {
               <fieldset class="flight-field duration-field"><legend>Flight Time</legend><div><label><input name="flightHours" type="number" min="0" max="30" inputmode="numeric" placeholder="0"><small>hours</small></label><b>:</b><label><input name="flightMinutes" type="number" min="0" max="59" inputmode="numeric" placeholder="00"><small>minutes</small></label></div></fieldset>
             </div>
           </div>
-          <div class="arrival-summary"><span>ESTIMATED TIME OF ARRIVAL</span><div class="arrival-time"><small>DUBLIN LOCAL TIME</small><strong id="estimated-arrival-dublin">Enter push back time, taxi time and flight time</strong></div><div class="arrival-time"><small id="destination-arrival-label">DESTINATION LOCAL TIME</small><strong id="estimated-arrival-destination">Select destination</strong></div></div>
+          <div class="arrival-summary"><span>ESTIMATED TIME OF ARRIVAL</span><div class="arrival-time"><small>DUBLIN LOCAL TIME</small><strong id="estimated-arrival-dublin">Enter the required times</strong></div><div class="arrival-time"><small id="destination-arrival-label">DESTINATION LOCAL TIME</small><strong id="estimated-arrival-destination">Select destination</strong></div></div>
         </section>
-        <section class="flight-panel notes-panel"><div class="flight-panel-head"><span class="card-tag">IN-FLIGHT NOTES</span><h3>Weather &amp; Other Information</h3></div>
+        <section class="flight-panel notes-panel"><div class="flight-panel-head"><span class="card-tag">FLIGHT NOTES</span></div>
           <div class="flight-fields notes-fields">
-            <label class="flight-field"><span>Weather Inflight</span><textarea name="weather" rows="3" placeholder="Enter relevant in-flight weather information"></textarea></label>
-            <label class="flight-field"><span>Other Notes or Information</span><textarea name="notes" rows="3" placeholder="Add any other flight information"></textarea></label>
+            <label class="flight-field"><span>Flight Information</span><textarea name="flightInformation" rows="3" placeholder="Information relevant to your flight. Weather, turbulence, delays etc."></textarea></label>
           </div>
         </section>
       </div>
@@ -836,7 +835,7 @@ function renderFlightInformation() {
     }
 
     if (!pushbackValue || !hasFlightTime || !hasTaxiTime) {
-      estimatedDublin.textContent = 'Enter push back time, taxi time and flight time';
+      estimatedDublin.textContent = 'Enter the required times';
       estimatedDestination.textContent = destination ? 'Enter timings to calculate' : 'Select destination';
       return;
     }
