@@ -1,12 +1,4 @@
 const data = window.CSM_DATA;
-const informationValidFrom = document.querySelector('#information-valid-from');
-if (informationValidFrom && data.informationLastUpdated) {
-  const updatedDate = new Date(`${data.informationLastUpdated}T00:00:00Z`);
-  if (Number.isFinite(updatedDate.getTime())) {
-    informationValidFrom.textContent = `Information Valid From: ${new Intl.DateTimeFormat('en-IE', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(updatedDate)}`;
-  }
-}
-
 const sections = {
   destinations: { title: 'Destination Guide', desc: 'Select your destination from the list below to find Airport, Hotel & Transport Information' },
   aircraft: { title: 'Aircraft Types', desc: 'Aircraft Seating Capacity and Registrations' },
@@ -211,7 +203,7 @@ function renderCards(cards) {
     if (card[0] === 'BID WINDOWS') return renderBidWindowsCard();
     if (card[0] === 'CREDITS') return renderCreditDatesCard();
     if (card[0] === 'EXPENSES') return renderOvernightAllowancesCard();
-    return `<article class="card"><span class="card-tag">${escapeHtml(card[0])}</span><h3>${escapeHtml(card[1])}</h3><p>${escapeHtml(card[2])}</p><div class="card-foot">NOT POPULATED FROM THE PROVIDED WORKBOOKS</div></article>`;
+    return `<article class="card"><span class="card-tag">${escapeHtml(card[0])}</span><h3>${escapeHtml(card[1])}</h3><p>${escapeHtml(card[2])}</p></article>`;
   }).join('')}</div>`;
 }
 
@@ -448,7 +440,7 @@ content.addEventListener('change', event => {
 function renderNinthCrewCard(card) {
   const destinationOptions = [...data.destinations].sort((a, b) => a.name.localeCompare(b.name)).map(destination => `<option value="${escapeHtml(destination.code)}">${escapeHtml(destination.name)} (${escapeHtml(destination.code)})</option>`).join("");
   const flightOptions = data.flightSchedule.map((flight, index) => `<option value="${index}">${escapeHtml(flight.flightNumber)}</option>`).join('');
-  return `<article class="card fdp-card"><span class="card-tag">${escapeHtml(card[0])}</span><h3>${escapeHtml(card[1])}</h3><p>The 9th Crew Member Protocol applies to transatlantic flights when it becomes apparent that the FDP will exceed 13 hours.</p><div class="protocol-steps"><section><h4>Starting the Process</h4><p>When this is known, the CSM / No. 1 should liaise with the on-duty Operations Crew Manager (OCM) and Crew Control to advise them that a 9th Crew Member is required.</p></section><section><h4>Required Information</h4><p>When contacting the OCM and Crew Control, provide all relevant information available, such as:</p><ul class="protocol-info-list"><li>Nature of the delay</li><li>Expected duration of the delay</li><li>Planned flight time</li><li>Planned taxi time for departure and arrival</li><li>Any other relevant information</li></ul></section><section><h4>When the ninth is provided</h4><p>The ninth crew member is surplus to the operating crew and should be used to support in-flight rest. Duty and rest should remain balanced among the operating cabin crew.</p></section><section><h4>If a 9th Crew Member is <em>NOT</em> Provided</h4><p>The CSM should inform the remaining operating crew and explain why a 9th Crew Member may not be available. If none is available, each operating crew member will receive the applicable approved short-crew credit shown below.</p></section></div><div class="protocol-credits"><h4>Short-Crew Credits</h4><table class="fdp-table protocol-credit-table"><thead><tr><th scope="col">Situation in the protocol</th><th scope="col">Credits per crew member</th></tr></thead><tbody><tr><th scope="row">Known delay: FDP exceeds 13 hours and no 9th Crew Member is provided when requested</th><td>28</td></tr><tr><th scope="row">Unknown delay: maximum FDP exceeds 13 h 15 min</th><td>28</td></tr><tr><th scope="row">Unknown delay: maximum FDP is less than 13 h 15 min</th><td>10</td></tr></tbody></table></div><section class="ninth-estimator" aria-labelledby="ninth-estimator-title"><span class="card-tag">ESTIMATE</span><h4 id="ninth-estimator-title">Do I Need a 9th Calculator?</h4><p>Estimate the FDP from crew report through estimated pushback, flight and arrival taxi.</p><div class="ninth-flight-route-fields"><label class="acclim-field"><span>Flight Number</span><select id="ninth-flight-number" aria-label="Flight Number"><option value="">Select flight number</option>${flightOptions}</select></label><label class="acclim-field"><span>Destination</span><select id="ninth-destination"><option value="">Select destination</option>${destinationOptions}</select></label></div><div class="ninth-estimator-fields"><label class="acclim-field"><span>Crew report time</span><input id="ninth-report-time" type="time" aria-label="Crew report time"></label><label class="acclim-field"><span>Estimated pushback time</span><input id="ninth-pushback-time" type="time" aria-label="Estimated pushback time"></label><fieldset class="flight-field ninth-flight-time"><legend>Flight time</legend><div><label><input id="ninth-flight-hours" type="number" min="0" max="30" step="1" inputmode="numeric" placeholder="0" aria-label="Flight time hours"><small>hours</small></label><b>:</b><label><input id="ninth-flight-minutes" type="number" min="0" max="59" step="1" inputmode="numeric" placeholder="00" aria-label="Flight time minutes"><small>minutes</small></label></div></fieldset></div><label class="acclim-field ninth-extra-field"><span>Additional information (optional)</span><textarea id="ninth-extra-info" rows="3" placeholder="Add details to include in the request"></textarea></label><p class="ninth-estimator-assumption">Estimate includes 15 minutes for departure taxi and 15 minutes for arrival taxi. Enter report and pushback times using the same Dublin time.</p><div id="ninth-estimator-result" class="ninth-estimator-result" role="status" aria-live="polite" hidden></div><button class="ninth-reset-button" id="ninth-reset-calculator" type="button">Reset Calculator</button></section><small class="fdp-source-note">Protocol dated 14 December 2018 · addendum dated 12 September 2019.</small></article>`;
+  return `<article class="card fdp-card"><span class="card-tag">${escapeHtml(card[0])}</span><h3>${escapeHtml(card[1])}</h3><p>The 9th Crew Member Protocol applies to transatlantic flights when it becomes apparent that the FDP will exceed 13 hours.</p><div class="protocol-steps"><section><h4>Starting the Process</h4><p>When this is known, the CSM / No. 1 should liaise with the on-duty Operations Crew Manager (OCM) and Crew Control to advise them that a 9th Crew Member is required.</p></section><section><h4>Required Information</h4><p>When contacting the OCM and Crew Control, provide all relevant information available, such as:</p><ul class="protocol-info-list"><li>Nature of the delay</li><li>Expected duration of the delay</li><li>Planned flight time</li><li>Planned taxi time for departure and arrival</li><li>Any other relevant information</li></ul></section><section><h4>When the ninth is provided</h4><p>The ninth crew member is surplus to the operating crew and should be used to support in-flight rest. Duty and rest should remain balanced among the operating cabin crew.</p></section><section><h4>If a 9th Crew Member is <em>NOT</em> Provided</h4><p>The CSM should inform the remaining operating crew and explain why a 9th Crew Member may not be available. If none is available, each operating crew member will receive the applicable approved short-crew credit shown below.</p></section></div><div class="protocol-credits"><h4>Short-Crew Credits</h4><table class="fdp-table protocol-credit-table"><thead><tr><th scope="col">Situation in the protocol</th><th scope="col">Credits per crew member</th></tr></thead><tbody><tr><th scope="row">Known delay: FDP exceeds 13 hours and no 9th Crew Member is provided when requested</th><td>28</td></tr><tr><th scope="row">Unknown delay: maximum FDP exceeds 13 h 15 min</th><td>28</td></tr><tr><th scope="row">Unknown delay: maximum FDP is less than 13 h 15 min</th><td>10</td></tr></tbody></table></div><section class="ninth-estimator" aria-labelledby="ninth-estimator-title"><span class="card-tag">ESTIMATE</span><h4 id="ninth-estimator-title">9th Crew Member Estimator</h4><p>Estimate the FDP from crew report through estimated pushback, flight and arrival taxi.</p><div class="ninth-flight-route-fields"><label class="acclim-field"><span>Flight Number</span><select id="ninth-flight-number" aria-label="Flight Number"><option value="">Select flight number</option>${flightOptions}</select></label><label class="acclim-field"><span>Destination</span><select id="ninth-destination"><option value="">Select destination</option>${destinationOptions}</select></label></div><div class="ninth-estimator-fields"><label class="acclim-field"><span>Crew report time</span><input id="ninth-report-time" type="time" aria-label="Crew report time"></label><label class="acclim-field"><span>Estimated pushback time</span><input id="ninth-pushback-time" type="time" aria-label="Estimated pushback time"></label><fieldset class="flight-field ninth-flight-time"><legend>Flight time</legend><div><label><input id="ninth-flight-hours" type="number" min="0" max="30" step="1" inputmode="numeric" placeholder="0" aria-label="Flight time hours"><small>hours</small></label><b>:</b><label><input id="ninth-flight-minutes" type="number" min="0" max="59" step="1" inputmode="numeric" placeholder="00" aria-label="Flight time minutes"><small>minutes</small></label></div></fieldset></div><label class="acclim-field ninth-extra-field"><span>Additional information (optional)</span><textarea id="ninth-extra-info" rows="3" placeholder="Add details to include in the request"></textarea></label><p class="ninth-estimator-assumption">Estimate includes 15 minutes for departure taxi and 15 minutes for arrival taxi. Enter report and pushback times using the same Dublin time.</p><div id="ninth-estimator-result" class="ninth-estimator-result" role="status" aria-live="polite" hidden></div><button class="ninth-reset-button" id="ninth-reset-calculator" type="button">Reset Calculator</button></section><small class="fdp-source-note">Protocol dated 14 December 2018 · addendum dated 12 September 2019.</small></article>`;
 }
 
 function updateNinthCrewEstimate() {
@@ -532,7 +524,7 @@ function renderDestinations() {
 }
 
 function renderDestinationProfile(destination) {
-  const facts = data.destinationFacts.filter(fact => fact.code === destination.code);
+  const facts = data.destinationFacts.map((fact, index) => ({ ...fact, searchIndex: index })).filter(fact => fact.code === destination.code);
   const metadata = `<div class="profile-meta"><div><span>TIME AT DUBLIN</span><strong id="dublin-current-time">Calculating…</strong></div><div><span>TIME AT DESTINATION</span><strong id="destination-current-time">Calculating…</strong></div><div><span>CURRENT WEATHER AT AIRPORT</span><strong id="destination-weather" aria-live="polite">Loading weather…</strong><small class="weather-attribution">Weather by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></small></div></div>`;
   if (!facts.length) {
     return metadata + `<div class="empty"><strong>No destination details entered yet</strong>This location is present in the destination index, but the source register has no detailed records for it.</div>`;
@@ -555,7 +547,7 @@ function renderDestinationProfile(destination) {
       const mapLink = destinationMapLink(fact, destination);
       const contact = destinationContactValue(fact);
       const value = contact || `<div class="profile-value">${escapeHtml(fact.value || 'No value entered')}</div>`;
-      return `<div class="profile-record"><div class="profile-record-heading"><strong>${escapeHtml(fact.field)}</strong></div>${value}${mapLink}</div>`;
+      return `<div class="profile-record" id="destination-fact-${fact.searchIndex}"><div class="profile-record-heading"><strong>${escapeHtml(fact.field)}</strong></div>${value}${mapLink}</div>`;
     }).join('');
     const cardClass = category === 'Crew Transport' ? 'card profile-card crew-transport-card' : 'card profile-card';
     return `<article class="${cardClass}"><span class="card-tag">${escapeHtml(category)}</span><div class="profile-fields">${records}</div></article>`;
@@ -594,7 +586,7 @@ function renderHotelAmenities(facts) {
     } else {
       status = `<span class="amenity-value">${escapeHtml(value || 'Not listed')}</span>`;
     }
-    return `<div class="amenity-item"><strong>${escapeHtml(label)}</strong>${status}</div>`;
+    return `<div class="amenity-item"${fact.searchIndex !== undefined ? ` id="destination-fact-${fact.searchIndex}"` : ''}><strong>${escapeHtml(label)}</strong>${status}</div>`;
   }).join('');
   return `<article class="card profile-card hotel-amenities-card"><span class="card-tag">Hotel Amenities</span><div class="amenity-grid">${items}</div></article>`;
 }
@@ -808,7 +800,7 @@ function renderFlightInformation() {
         </section>
         <section class="flight-panel notes-panel"><div class="flight-panel-head"><span class="card-tag">FLIGHT NOTES</span></div>
           <div class="flight-fields notes-fields">
-            <label class="flight-field"><span>Flight Information</span><textarea name="flightInformation" rows="3" placeholder="Information relevant to your flight. Weather, turbulence, delays etc."></textarea></label>
+            <label class="flight-field"><span>Flight notes</span><textarea name="flightInformation" rows="3" placeholder="Add operational notes such as weather, turbulence, delays or other items to brief the crew."></textarea></label>
           </div>
         </section>
       </div>
@@ -919,9 +911,7 @@ function openSection(id) {
   }
   const section = sections[id];
   if (!section) return;
-  content.innerHTML = heading('', section.title, section.desc)
-    + (['flight', 'crew', 'roster'].includes(id) ? '' : caution('This section has not been populated from the two provided workbooks yet.'))
-    + renderCards(section.cards || []);
+  content.innerHTML = heading('', section.title, section.desc) + renderCards(section.cards || []);
   if (id === 'crew') {
     initCreditDatesCard();
     initCommissionCalculator();
@@ -956,25 +946,41 @@ document.querySelector('.home-button').addEventListener('click', event => {
 });
 
 const searchable = [
-  ...data.destinations.map(destination => ({ id: 'destinations', title: destination.name, tag: destination.code, detail: `${destination.country} · ${destination.routeStatus}`, destinationCode: destination.code })),
-  ...data.destinationFacts.map(fact => ({ id: 'destinations', title: fact.field, tag: fact.code, detail: fact.value, destinationCode: fact.code })),
+  ...data.destinations.map(destination => ({ id: 'destinations', title: destination.name, tag: destination.code, detail: `${destination.country} · ${destination.routeStatus}`, destinationCode: destination.code, group: 'Destinations' })),
+  ...data.destinationFacts.map((fact, index) => ({ id: 'destinations', title: fact.field, tag: `${fact.destination} · ${fact.code}`, detail: fact.value, destinationCode: fact.code, destinationName: fact.destination, group: `${fact.destination} · ${fact.category}`, targetId: `destination-fact-${index}` })),
   ...aircraftConfigurations().flatMap(aircraft => [
-    { id: 'aircraft', title: aircraft.type, tag: 'AIRCRAFT', detail: `${aircraft.total} passenger seats · ${aircraft.registrations.join(', ')}`, aircraftId: aircraftId(aircraft) },
-    ...aircraft.registrations.map(registration => ({ id: 'aircraft', title: registration, tag: aircraft.type, detail: `${aircraft.total} passenger seats · ${aircraft.cabinCrewSeats} cabin crew seats`, aircraftId: aircraftId(aircraft) }))
+    { id: 'aircraft', title: aircraft.type, tag: 'AIRCRAFT', detail: `${aircraft.total} passenger seats · ${aircraft.registrations.join(', ')}`, aircraftId: aircraftId(aircraft), group: 'Aircraft' },
+    ...aircraft.registrations.map(registration => ({ id: 'aircraft', title: registration, tag: aircraft.type, detail: `${aircraft.total} passenger seats · ${aircraft.cabinCrewSeats} cabin crew seats`, aircraftId: aircraftId(aircraft), group: 'Aircraft' }))
   ]),
-  ...Object.entries(sections).filter(([id]) => !['destinations', 'aircraft'].includes(id)).map(([id, section]) => ({ id, title: section.title, tag: 'SECTION', detail: section.desc })),
-  ...Object.entries(sections).flatMap(([id, section]) => (section.cards || []).map(card => ({ id, title: card[1], tag: card[0], detail: card[2] }))),
-  ...(data.usefulLinks || []).map(link => ({ id: 'contacts', title: link.title, tag: 'USEFUL LINK', detail: 'Company website or service' })),
-  ...(data.usefulForms || []).map(form => ({ id: 'contacts', title: form.title, tag: 'USEFUL FORM', detail: 'Online form' })),
-  ...(data.usefulContacts || []).map(contact => ({ id: 'contacts', title: contact.name, tag: 'CONTACT', detail: [contact.phone, contact.email].filter(Boolean).join(' · ') }))
+  ...Object.entries(sections).filter(([id]) => !['destinations', 'aircraft'].includes(id)).map(([id, section]) => ({ id, title: section.title, tag: 'SECTION', detail: section.desc, group: 'Sections' })),
+  ...Object.entries(sections).flatMap(([id, section]) => (section.cards || []).map(card => ({ id, title: card[1], tag: card[0], detail: card[2], group: section.title }))),
+  ...(data.usefulLinks || []).map(link => ({ id: 'contacts', title: link.title, tag: 'USEFUL LINK', detail: 'Company website or service', group: 'Useful links' })),
+  ...(data.usefulForms || []).map(form => ({ id: 'contacts', title: form.title, tag: 'USEFUL FORM', detail: 'Online form', group: 'Useful forms' })),
+  ...(data.usefulContacts || []).map(contact => ({ id: 'contacts', title: contact.name, tag: 'CONTACT', detail: [contact.phone, contact.email].filter(Boolean).join(' · '), group: 'Contacts' }))
 ];
 
 function showResults(query) {
   const term = query.trim().toLowerCase();
   if (!term) { results.hidden = true; return; }
-  const matches = searchable.filter(item => `${item.title} ${item.tag} ${item.detail}`.toLowerCase().includes(term)).slice(0, 10);
+  const rank = item => {
+    const title = item.title.toLowerCase();
+    if (title === term) return 0;
+    if (title.startsWith(term)) return 1;
+    if (item.tag.toLowerCase().includes(term)) return 2;
+    return 3;
+  };
+  const matches = searchable
+    .filter(item => `${item.title} ${item.tag} ${item.detail} ${item.group || ''}`.toLowerCase().includes(term))
+    .sort((a, b) => rank(a) - rank(b) || a.title.localeCompare(b.title))
+    .slice(0, 20);
+  const grouped = new Map();
+  matches.forEach(item => {
+    const group = item.group || 'Other';
+    if (!grouped.has(group)) grouped.set(group, []);
+    grouped.get(group).push(item);
+  });
   results.innerHTML = matches.length
-    ? matches.map((item, i) => `<button class="result" data-index="${searchable.indexOf(item)}"><span class="result-tag">${escapeHtml(item.tag)}</span><span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.detail)}</small></span></button>`).join('')
+    ? [...grouped.entries()].map(([group, items]) => `<div class="search-result-group"><div class="search-result-heading">${escapeHtml(group)}</div>${items.map(item => `<button class="result" data-index="${searchable.indexOf(item)}"><span class="result-tag">${escapeHtml(item.tag)}</span><span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.detail)}</small></span></button>`).join('')}</div>`).join('')
     : '<div class="result"><span><strong>No matches</strong><small>Try a destination, aircraft registration or topic.</small></span></div>';
   results.hidden = false;
   results.querySelectorAll('[data-index]').forEach(button => button.onclick = () => {
@@ -984,6 +990,7 @@ function showResults(query) {
     results.hidden = true;
     search.value = '';
     content.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (item.targetId) requestAnimationFrame(() => document.getElementById(item.targetId)?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
     if (item.aircraftId) document.getElementById(item.aircraftId)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 }
