@@ -819,6 +819,12 @@ function renderFlightInformation() {
     .map(origin => `<option value="${escapeHtml(origin.code)}">${escapeHtml(origin.name)} (${escapeHtml(origin.code)})</option>`).join('');
   content.innerHTML = heading('', sections.flightInfo.title, sections.flightInfo.desc)
     + `<form class="flight-form" id="flight-information-form" autocomplete="off">
+      <section class="flight-panel flight-route-panel"><div class="flight-panel-head"><h3>Flight Route</h3></div>
+        <div class="flight-fields flight-route-fields">
+          <label class="flight-field"><span>Destination</span><select name="destination"><option value="">Select destination</option>${destinationOptions}</select></label>
+          <label class="flight-field" id="origin-airport-wrap" hidden><span>Origin airport</span><select name="originAirport" id="origin-airport"><option value="">Select origin airport</option>${originOptions}</select></label>
+        </div>
+      </section>
       <div class="flight-form-grid">
         <section class="flight-panel"><div class="flight-panel-head"><h3>Passenger Figures</h3></div>
           <div class="passenger-counts">
@@ -832,10 +838,8 @@ function renderFlightInformation() {
           </div>
           <div class="passenger-total"><span>TOTAL PAX · INCLUDES INFANTS</span><strong id="passenger-total">0</strong></div>
         </section>
-        <section class="flight-panel"><div class="flight-panel-head"><h3>Destination &amp; Timings</h3></div>
+        <section class="flight-panel"><div class="flight-panel-head"><h3>Flight Timings</h3></div>
           <div class="flight-fields">
-            <label class="flight-field"><span>Destination</span><select name="destination"><option value="">Select destination</option>${destinationOptions}</select></label>
-            <label class="flight-field" id="origin-airport-wrap" hidden><span>Origin airport</span><select name="originAirport" id="origin-airport"><option value="">Select origin airport</option>${originOptions}</select></label>
             <div class="flight-field pushback-time-field"><label for="pushback-time">Pushback time</label><input id="pushback-time" name="pushback" type="datetime-local" aria-describedby="pushback-time-zone"><small id="pushback-time-zone" role="status" aria-live="polite">Time zone used: Dublin (Europe/Dublin)</small><button class="current-time-button" type="button" id="use-current-pushback-time">Use current time</button></div>
             <div class="flight-duration-pair">
               <label class="flight-field taxi-minutes-field"><span>Taxi (mins)</span><input name="taxiMinutes" type="number" min="1" step="1" inputmode="numeric" placeholder="0"></label>
@@ -850,8 +854,15 @@ function renderFlightInformation() {
           </div>
         </section>
       </div>
-      <div class="flight-form-footer"><small id="flight-save-status" role="status">Entries stay in this page only and are cleared when you leave. PRMs are recorded separately and are not included in passenger total.</small><div class="flight-footer-actions"><button class="clear-flight-button" type="button" id="copy-flight-information">Copy Flight Summary</button><button class="clear-flight-button" type="button" id="clear-flight-information">Clear Flight Information</button></div></div>
-    </form>`;
+      <div class="flight-form-footer"><small id="flight-save-status" role="status">Entries stay in this page only and are cleared when you leave. PRMs are recorded separately and are not included in passenger total.</small><div class="flight-footer-actions"><button class="clear-flight-button" type="button" id="show-flight-snapshot">Flight Snapshot</button><button class="clear-flight-button" type="button" id="clear-flight-information">Clear Flight Information</button></div></div>
+    </form>
+    <dialog class="flight-snapshot-dialog" id="flight-snapshot-dialog" aria-labelledby="flight-snapshot-title">
+      <article class="flight-snapshot-card">
+        <header class="flight-snapshot-header"><span class="card-tag">AERKIT · FLIGHT SNAPSHOT</span><button class="snapshot-close" type="button" aria-label="Close Flight Snapshot">×</button></header>
+        <h2 id="flight-snapshot-title">Flight Snapshot</h2>
+        <div id="flight-snapshot-content" class="flight-snapshot-content"></div>
+      </article>
+    </dialog>`;
 
   const form = content.querySelector('#flight-information-form');
   const saveStatus = content.querySelector('#flight-save-status');
@@ -932,14 +943,10 @@ function renderFlightInformation() {
     }
 
     const arrival = new Date(pushback.getTime() + (flightHours * 60 + flightMinutes + taxiMinutes) * 60_000);
-    const formatArrival = timeZone => new Intl.DateTimeFormat('en-IE', {
-      timeZone, weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
-      hourCycle: 'h23', timeZoneName: 'short'
-    }).format(arrival);
-    estimatedDublin.textContent = formatArrival('Europe/Dublin');
+    estimatedDublin.textContent = formatFlightTime(arrival, 'Europe/Dublin');
     const destinationTimeZone = destinationTimeZones[destination?.code];
     estimatedDestination.textContent = destination
-      ? (destinationTimeZone ? formatArrival(destinationTimeZone) : 'Time zone unavailable')
+      ? (destinationTimeZone ? formatFlightTime(arrival, destinationTimeZone) : 'Time zone unavailable')
       : 'Select destination';
   };
 
@@ -969,28 +976,52 @@ function renderFlightInformation() {
     saveStatus.textContent = 'Flight information cleared from this page.';
     updateFlightSummary();
   });
-  content.querySelector('#copy-flight-information').addEventListener('click', async () => {
+  content.querySelector('#show-flight-snapshot').addEventListener('click', () => {
     const values = Object.fromEntries(new FormData(form).entries());
-    const destination = data.destinations.find(item => item.code === values.destination)?.name || values.destination || 'Not selected';
-    const summary = [
-      'AerKit Flight Summary', `Destination: ${destination}`,
-      ...(values.originAirport ? [`Origin: ${data.destinations.find(item => item.code === values.originAirport)?.name || values.originAirport}`] : []),
-      `Passengers (including infants): ${content.querySelector('#passenger-total').textContent}`,
-      `Infants: ${values.infants || '0'} · PRMs (separate): ${values.prms || '0'}`,
-      `Pushback: ${values.pushback || 'Not entered'} · ${content.querySelector('#pushback-time-zone').textContent.replace(/^Time zone used: /, '')}`,
-      `Taxi: ${values.taxiMinutes ? `${values.taxiMinutes} minutes` : 'Not entered'}`,
-      `Flight time: ${values.flightHours || '0'}h ${values.flightMinutes || '0'}m`,
-      `Estimated arrival Dublin: ${content.querySelector('#estimated-arrival-dublin').textContent}`,
-      `Estimated arrival destination: ${content.querySelector('#estimated-arrival-destination').textContent}`,
-      ...(values.flightInformation ? [`Flight notes: ${values.flightInformation}`] : [])
-    ].join('\n');
-    try {
-      await navigator.clipboard.writeText(summary);
-      saveStatus.textContent = 'Flight summary copied to clipboard.';
-    } catch {
-      saveStatus.textContent = 'Clipboard unavailable. Select and copy the flight details manually.';
+    const destination = data.destinations.find(item => item.code === values.destination)?.name
+      || (values.destination === 'DUB' ? 'Dublin' : 'Not selected');
+    const origin = data.destinations.find(item => item.code === values.originAirport)?.name;
+    const snapshotPushbackZone = values.destination === 'DUB' ? destinationTimeZones[values.originAirport] : 'Europe/Dublin';
+    const pushback = values.pushback && snapshotPushbackZone
+      ? formatFlightTime(wallTimeToDate(values.pushback, snapshotPushbackZone), snapshotPushbackZone)
+      : 'Not entered';
+    const pax = ['business', 'premiumEconomy', 'economy', 'infants'].reduce((sum, name) => sum + Math.max(0, Number(values[name]) || 0), 0);
+    const flightTime = `${values.flightHours || '0'}h ${values.flightMinutes || '0'}m`;
+    const rows = [
+      ['Route', `${origin ? `${origin} → ` : ''}${destination}`],
+      ['Pushback', pushback],
+      ['Flight time', flightTime],
+      ['Taxi', values.taxiMinutes ? `${values.taxiMinutes} min` : 'Not entered'],
+      ['Passengers', [['Business', values.business || '0'], ['Premium Economy', values.premiumEconomy || '0'], ['Economy', values.economy || '0'], ['INF', values.infants || '0'], ['PRM', values.prms || '0']]],
+      ['Total Passengers', String(pax)],
+      ['Dublin arrival', content.querySelector('#estimated-arrival-dublin').textContent],
+      ['Local arrival', content.querySelector('#estimated-arrival-destination').textContent],
+      ['Flight notes', values.flightInformation || 'None']
+    ];
+    content.querySelector('#flight-snapshot-content').innerHTML = rows.map(([label, value]) => {
+      const rowClass = label === 'Total Passengers' ? ' snapshot-total-row' : '';
+      if (label === 'Passengers') {
+        const passengers = value.map(([name, count]) => `<div><span>${escapeHtml(name)}</span><strong>${escapeHtml(count)}</strong></div>`).join('');
+        return `<section class="snapshot-row snapshot-passenger-row"><span>${escapeHtml(label)}</span><div class="snapshot-passenger-list">${passengers}</div></section>`;
+      }
+      const formattedValue = escapeHtml(value);
+      return `<section class="snapshot-row${rowClass}"><span>${escapeHtml(label)}</span><strong>${formattedValue}</strong></section>`;
     }
+    ).join('');
+    content.querySelector('#flight-snapshot-dialog').showModal();
   });
+  const snapshotDialog = content.querySelector('#flight-snapshot-dialog');
+  snapshotDialog.querySelector('.snapshot-close').addEventListener('click', () => snapshotDialog.close());
+  snapshotDialog.addEventListener('click', event => { if (event.target === snapshotDialog) snapshotDialog.close(); });
+}
+
+function formatFlightTime(date, timeZone) {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone, day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
+    hourCycle: 'h23', timeZoneName: 'short'
+  }).formatToParts(date);
+  const part = type => parts.find(item => item.type === type)?.value || '';
+  return `${part('hour')}:${part('minute')} ${part('timeZoneName')} | ${part('day')}-${part('month')}`;
 }
 
 function wallTimeToDate(value, timeZone) {
