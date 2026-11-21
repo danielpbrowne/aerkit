@@ -15,12 +15,14 @@
   --shadow:0 12px 32px #1c33420d;
 }
 *{box-sizing:border-box}
+.skip-link{position:fixed;z-index:30;top:8px;left:8px;padding:10px 14px;transform:translateY(-160%);border-radius:4px;background:#fff;color:#142b3b;font-weight:700}.skip-link:focus{transform:translateY(0)}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--canvas);color:var(--ink);font:19px/1.55 Urbanist,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 .topbar{position:sticky;top:0;z-index:10;height:76px;padding:0 max(5vw,24px);display:flex;align-items:center;justify-content:flex-end;background:var(--navy);border-bottom:1px solid #344c5d;color:#f7f7f2}
 .top-actions{display:flex;align-items:center;justify-content:flex-end;gap:16px;width:100%}
 .icon-button{border:1px solid #697a82;background:transparent;border-radius:20px;padding:8px 15px;color:#f7f7f2;font:600 15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;cursor:pointer}
 .icon-button:hover{background:#294354}
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;padding:8px}.theme-icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.theme-icon-moon{display:none}html[data-theme="dark"] .theme-icon-sun{display:none}html[data-theme="dark"] .theme-icon-moon{display:block}
 .home-button{display:inline-flex;min-height:40px;align-items:center;gap:7px;padding:7px 13px;border:1px solid #697a82;border-radius:20px;color:#f7f7f2;text-decoration:none;font:600 14px Urbanist,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 .home-button:hover{background:#294354}.home-button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 main{max-width:1120px;margin:auto;padding:0 30px}
@@ -227,6 +229,19 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:14px;pa
 .feedback-submit{min-height:44px;padding:10px 16px;border:1px solid #176b68;border-radius:5px;background:#176b68;color:#fff;font:600 15px Urbanist,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;cursor:pointer}
 .feedback-submit:hover,.feedback-submit:focus-visible{background:#105653}
 @media(max-width:600px){.feedback-form{grid-template-columns:1fr;gap:11px}.feedback-form .feedback-detail-field,.feedback-form .feedback-context-field,.feedback-form .feedback-actions{grid-column:auto}.feedback-actions{align-items:stretch;flex-direction:column}.feedback-submit{width:100%}}
+.feedback-copy{min-height:44px;padding:10px 16px;border:1px solid var(--line);border-radius:5px;background:var(--paper);color:var(--ink);font:600 15px Urbanist,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;cursor:pointer}.feedback-status{grid-column:1/-1;margin:0;color:var(--muted);font-size:14px}
+:focus-visible{outline:3px solid #a98727;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+html[data-theme="dark"]{color-scheme:dark;--ink:#e2e8e7;--navy:#172d3b;--navy-deep:#dce6e4;--muted:#b5c2c2;--line:#43545a;--canvas:#101a20;--paper:#1b282f;--white:#1b282f;--amber:#d9b653;--amber-soft:#403820;--sage:#88a39a;--shadow:0 12px 32px #0005}
+html[data-theme="dark"] body{background:var(--canvas);color:var(--ink)}
+html[data-theme="dark"] .welcome,html[data-theme="dark"] .topbar{background:#132833}
+html[data-theme="dark"] .card,html[data-theme="dark"] .destination,html[data-theme="dark"] .flight-panel,html[data-theme="dark"] .useful-link-card,html[data-theme="dark"] .useful-person-card,html[data-theme="dark"] .search-results{background:var(--paper);color:var(--ink);border-color:var(--line)}
+html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="dark"] textarea,html[data-theme="dark"] .useful-resource-link,html[data-theme="dark"] .ninth-estimator-fields input,html[data-theme="dark"] .ninth-extra-field textarea{background:#111d23;color:var(--ink);border-color:var(--line)}
+html[data-theme="dark"] .section-navigation,html[data-theme="dark"] .section-menu-toggle{background:var(--canvas);color:var(--ink)}
+html[data-theme="dark"] .section-navigation button,html[data-theme="dark"] .credit-date-grid>div{background:var(--paper);color:var(--ink)}
+html[data-theme="dark"] .search-result-heading,html[data-theme="dark"] .ninth-estimator,html[data-theme="dark"] .ife-note,html[data-theme="dark"] .acclim-note{background:#26353a;color:#d9e2df}
+html[data-theme="dark"] .destination:hover,html[data-theme="dark"] .useful-resource-link:hover{background:#273940}
+html[data-theme="dark"] footer{border-color:var(--line)}
 
 .ife-reference-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 .ife-reference-card{min-width:0}
@@ -236,3 +251,8 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:14px;pa
 .ife-note{margin-top:13px;padding:11px 12px;border-left:3px solid #8ea39b;border-radius:0 4px 4px 0;background:#eaf0ec;color:#4e655e;font-size:14px;line-height:1.45}
 .ife-note.is-warning{border-left-color:var(--amber);background:#f7f3e4;color:#665624}
 @media(max-width:760px){.ife-reference-grid{grid-template-columns:1fr}}
+#origin-airport-wrap[hidden]{display:none}
+.pushback-time-field{min-width:0;width:100%}
+#pushback-time{display:block;box-sizing:border-box;width:100%;min-width:0;max-width:100%}
+#pushback-time::-webkit-date-and-time-value{min-width:0;text-align:left}
+.essentials-card{display:block;width:100%;min-height:170px;text-align:left;cursor:pointer}.essentials-card:hover,.essentials-card:focus-visible{border-color:#9f8a4a;transform:translateY(-2px)}.essentials-card h3{margin:10px 0 6px;color:var(--navy-deep);font:600 20px Outfit,Urbanist,sans-serif}.essentials-card p{margin:0;color:var(--muted);font-size:15px;line-height:1.45}.essentials-open{display:block;margin-top:16px;color:#176b68;font-weight:700}.destination-freshness{margin:10px 0 16px;color:#68787b;font-size:13px;line-height:1.4}.flight-footer-actions{display:flex;gap:8px}.flight-footer-actions .clear-flight-button{width:auto}

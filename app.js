@@ -1,5 +1,6 @@
 const data = window.CSM_DATA;
 const sections = {
+  essentials: { title: 'Crew essentials', desc: 'Quick access to the details and tools crews use most.' },
   destinations: { title: 'Destination Guide', desc: 'Select your destination from the list below to find Airport, Hotel & Transport Information' },
   aircraft: { title: 'Aircraft Types', desc: 'Aircraft Seating Capacity and Registrations' },
   flightInfo: { title: 'Flight Information', desc: '' },
@@ -77,6 +78,18 @@ const results = document.querySelector('#search-results');
 const sectionNavigation = document.querySelector('.section-navigation');
 const sectionMenuToggle = document.querySelector('#section-menu-toggle');
 const currentSectionLabel = document.querySelector('#current-section');
+const themeToggle = document.querySelector('#theme-toggle');
+const savedTheme = (() => { try { return localStorage.getItem('aerkit-theme'); } catch { return null; } })();
+if (savedTheme === 'dark' || (!savedTheme && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.dataset.theme = 'dark';
+themeToggle.setAttribute('aria-pressed', String(document.documentElement.dataset.theme === 'dark'));
+themeToggle.setAttribute('aria-label', document.documentElement.dataset.theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+themeToggle.addEventListener('click', () => {
+  const dark = document.documentElement.dataset.theme !== 'dark';
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  themeToggle.setAttribute('aria-pressed', String(dark));
+  themeToggle.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+  try { localStorage.setItem('aerkit-theme', dark ? 'dark' : 'light'); } catch {}
+});
 let destinationClockTimer;
 
 const destinationTimeZones = {
@@ -150,8 +163,9 @@ function renderFeedbackPage() {
         <label class="flight-field"><span>Feedback type</span><select id="feedback-category" required><option value="">Select a category</option><option>Airport Information</option><option>Outstation Contact Information</option><option>Hotel Information</option><option>Other</option><option>App Idea Suggestions</option></select></label>
         <label class="flight-field" id="feedback-destination-wrap" hidden><span>Destination</span><select id="feedback-destination"><option value="">Select destination</option>${destinationOptions}</select></label>
         <label class="flight-field feedback-detail-field"><span id="feedback-detail-label">Suggested Correction</span><textarea id="feedback-detail" rows="4" required placeholder="Describe the suggested correction"></textarea></label>
-        <label class="flight-field feedback-context-field"><span>Additional context (optional)</span><textarea id="feedback-context" rows="3" placeholder="Add any useful context or source details"></textarea></label>
-        <div class="feedback-actions"><button class="feedback-submit" type="submit">Email Feedback Report</button></div>
+        <label class="flight-field feedback-context-field"><span>Source or evidence (optional)</span><textarea id="feedback-context" rows="3" placeholder="Add a document name, link, date checked, or other evidence"></textarea></label>
+        <div class="feedback-actions"><button class="feedback-submit" type="submit">Save Feedback</button><button class="feedback-copy" type="button" id="feedback-copy" hidden>Copy report</button></div>
+        <p id="feedback-status" class="feedback-status" role="status" aria-live="polite"></p>
       </form>
     </article>`;
 }
@@ -164,6 +178,9 @@ function initFeedbackPage() {
   const destination = form.querySelector('#feedback-destination');
   const detailLabel = form.querySelector('#feedback-detail-label');
   const detail = form.querySelector('#feedback-detail');
+  const status = form.querySelector('#feedback-status');
+  const copyButton = form.querySelector('#feedback-copy');
+  let savedReport = '';
   const updateFields = () => {
     const selected = category.value;
     const idea = selected === 'App Idea Suggestions';
@@ -186,10 +203,20 @@ function initFeedbackPage() {
       `Category: ${selected}`,
       ...(destinationName ? [`Destination: ${destinationName}`] : []),
       `${selected === 'App Idea Suggestions' ? 'App idea suggestion' : 'Suggested correction'}: ${detail.value.trim()}`,
-      ...(extra ? [`Additional context: ${extra}`] : [])
+      ...(extra ? [`Source or evidence: ${extra}`] : [])
     ];
-    const mailto = `mailto:daniel.browne@outlook.ie?subject=${encodeURIComponent('AerKit - Suggested Edits')}&body=${encodeURIComponent(lines.join('\n\n'))}`;
-    window.location.href = mailto;
+    savedReport = lines.join('\n\n');
+    try { localStorage.setItem('aerkit-feedback-draft', savedReport); } catch {}
+    status.textContent = 'Feedback saved on this device. Copy the report if you want to share it.';
+    copyButton.hidden = false;
+  });
+  copyButton.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(savedReport);
+      status.textContent = 'Feedback report copied.';
+    } catch {
+      status.textContent = 'Clipboard unavailable. Your feedback remains saved on this device.';
+    }
   });
   updateFields();
 }
@@ -369,7 +396,7 @@ function renderBasicFdpCard(card) {
 }
 
 function renderAcclimatisationCard(card) {
-  return `<article class="card fdp-card"><span class="card-tag">${escapeHtml(card[0])}</span><h3>${escapeHtml(card[1])}</h3><p>When reporting for duty in Ireland, it is generally assumed you are acclimatised to Home Base local time. The time from that report time until your next report at an outstation, together with the time difference at the next report, determines your acclimatisation state.</p><form class="acclim-checker" id="acclim-checker"><label class="acclim-field"><span>Time Difference between Home Base &amp; Next Report Location</span><select name="difference" required><option value="">Select time difference</option><option value="0">Less than 4 hours</option><option value="1">4 to 6 hours</option><option value="2">More than 6 to 9 hours</option><option value="3">More than 9 to 12 hours</option></select></label><label class="acclim-field"><span>Time from Home Base Report until next report time</span><select name="elapsed" required><option value="">Select elapsed time</option><option value="0">Less than 48 hours</option><option value="1">48 to 71 hours 59 minutes</option><option value="2">72 to 95 hours 59 minutes</option><option value="3">96 to 119 hours 59 minutes</option><option value="4">120 hours or more</option></select></label><div class="acclim-actions"><button class="acclim-calculate" type="submit">Check acclimatisation</button><button class="acclim-reset" type="reset">Reset</button></div><div class="acclim-result" id="acclim-result" role="status" aria-live="polite" hidden></div></form><p class="acclim-note">This checker uses the information from EASA ORO.FTL.105 Definitions.</p></article>`;
+  return `<article class="card fdp-card"><span class="card-tag">${escapeHtml(card[0])}</span><h3>${escapeHtml(card[1])}</h3><p>If you report for duty in Ireland, you are assumed to be acclimatised to Home Base time. Your acclimatisation state at your next outstation report depends on the time elapsed since your Home Base report and the time difference at the outstation.</p><form class="acclim-checker" id="acclim-checker"><label class="acclim-field"><span>Time Difference between Home Base &amp; Next Report Location</span><select name="difference" required><option value="">Select time difference</option><option value="0">Less than 4 hours</option><option value="1">4 to 6 hours</option><option value="2">More than 6 to 9 hours</option><option value="3">More than 9 to 12 hours</option></select></label><label class="acclim-field"><span>Time from Home Base Report until next report time</span><select name="elapsed" required><option value="">Select elapsed time</option><option value="0">Less than 48 hours</option><option value="1">48 to 71 hours 59 minutes</option><option value="2">72 to 95 hours 59 minutes</option><option value="3">96 to 119 hours 59 minutes</option><option value="4">120 hours or more</option></select></label><div class="acclim-actions"><button class="acclim-calculate" type="submit">Check acclimatisation</button><button class="acclim-reset" type="reset">Reset</button></div><div class="acclim-result" id="acclim-result" role="status" aria-live="polite" hidden></div></form><p class="acclim-note">This checker uses the information from EASA ORO.FTL.105 Definitions.</p></article>`;
 }
 
 content.addEventListener('submit', event => {
@@ -440,7 +467,7 @@ content.addEventListener('change', event => {
 function renderNinthCrewCard(card) {
   const destinationOptions = [...data.destinations].sort((a, b) => a.name.localeCompare(b.name)).map(destination => `<option value="${escapeHtml(destination.code)}">${escapeHtml(destination.name)} (${escapeHtml(destination.code)})</option>`).join("");
   const flightOptions = data.flightSchedule.map((flight, index) => `<option value="${index}">${escapeHtml(flight.flightNumber)}</option>`).join('');
-  return `<article class="card fdp-card"><span class="card-tag">${escapeHtml(card[0])}</span><h3>${escapeHtml(card[1])}</h3><p>The 9th Crew Member Protocol applies to transatlantic flights when it becomes apparent that the FDP will exceed 13 hours.</p><div class="protocol-steps"><section><h4>Starting the Process</h4><p>When this is known, the CSM / No. 1 should liaise with the on-duty Operations Crew Manager (OCM) and Crew Control to advise them that a 9th Crew Member is required.</p></section><section><h4>Required Information</h4><p>When contacting the OCM and Crew Control, provide all relevant information available, such as:</p><ul class="protocol-info-list"><li>Nature of the delay</li><li>Expected duration of the delay</li><li>Planned flight time</li><li>Planned taxi time for departure and arrival</li><li>Any other relevant information</li></ul></section><section><h4>When the ninth is provided</h4><p>The ninth crew member is surplus to the operating crew and should be used to support in-flight rest. Duty and rest should remain balanced among the operating cabin crew.</p></section><section><h4>If a 9th Crew Member is <em>NOT</em> Provided</h4><p>The CSM should inform the remaining operating crew and explain why a 9th Crew Member may not be available. If none is available, each operating crew member will receive the applicable approved short-crew credit shown below.</p></section></div><div class="protocol-credits"><h4>Short-Crew Credits</h4><table class="fdp-table protocol-credit-table"><thead><tr><th scope="col">Situation in the protocol</th><th scope="col">Credits per crew member</th></tr></thead><tbody><tr><th scope="row">Known delay: FDP exceeds 13 hours and no 9th Crew Member is provided when requested</th><td>28</td></tr><tr><th scope="row">Unknown delay: maximum FDP exceeds 13 h 15 min</th><td>28</td></tr><tr><th scope="row">Unknown delay: maximum FDP is less than 13 h 15 min</th><td>10</td></tr></tbody></table></div><section class="ninth-estimator" aria-labelledby="ninth-estimator-title"><span class="card-tag">ESTIMATE</span><h4 id="ninth-estimator-title">9th Crew Member Estimator</h4><p>Estimate the FDP from crew report through estimated pushback, flight and arrival taxi.</p><div class="ninth-flight-route-fields"><label class="acclim-field"><span>Flight Number</span><select id="ninth-flight-number" aria-label="Flight Number"><option value="">Select flight number</option>${flightOptions}</select></label><label class="acclim-field"><span>Destination</span><select id="ninth-destination"><option value="">Select destination</option>${destinationOptions}</select></label></div><div class="ninth-estimator-fields"><label class="acclim-field"><span>Crew report time</span><input id="ninth-report-time" type="time" aria-label="Crew report time"></label><label class="acclim-field"><span>Estimated pushback time</span><input id="ninth-pushback-time" type="time" aria-label="Estimated pushback time"></label><fieldset class="flight-field ninth-flight-time"><legend>Flight time</legend><div><label><input id="ninth-flight-hours" type="number" min="0" max="30" step="1" inputmode="numeric" placeholder="0" aria-label="Flight time hours"><small>hours</small></label><b>:</b><label><input id="ninth-flight-minutes" type="number" min="0" max="59" step="1" inputmode="numeric" placeholder="00" aria-label="Flight time minutes"><small>minutes</small></label></div></fieldset></div><label class="acclim-field ninth-extra-field"><span>Additional information (optional)</span><textarea id="ninth-extra-info" rows="3" placeholder="Add details to include in the request"></textarea></label><p class="ninth-estimator-assumption">Estimate includes 15 minutes for departure taxi and 15 minutes for arrival taxi. Enter report and pushback times using the same Dublin time.</p><div id="ninth-estimator-result" class="ninth-estimator-result" role="status" aria-live="polite" hidden></div><button class="ninth-reset-button" id="ninth-reset-calculator" type="button">Reset Calculator</button></section><small class="fdp-source-note">Protocol dated 14 December 2018 · addendum dated 12 September 2019.</small></article>`;
+  return `<article class="card fdp-card"><span class="card-tag">${escapeHtml(card[0])}</span><h3>${escapeHtml(card[1])}</h3><p>The 9th Crew Member Protocol applies to transatlantic flights when it becomes apparent that the FDP will exceed 13 hours.</p><div class="protocol-steps"><section><h4>Starting the Process</h4><p>When this is known, the CSM / No. 1 should liaise with the on-duty Operations Crew Manager (OCM) and Crew Control to advise them that a 9th Crew Member is required.</p></section><section><h4>Required Information</h4><p>When contacting the OCM and Crew Control, provide all relevant information available, such as:</p><ul class="protocol-info-list"><li>Nature of the delay</li><li>Expected duration of the delay</li><li>Planned flight time</li><li>Planned taxi time for departure and arrival</li><li>Any other relevant information</li></ul></section><section><h4>When the ninth is provided</h4><p>The ninth crew member is surplus to the operating crew and should be used to support in-flight rest. Duty and rest should remain balanced among the operating cabin crew.</p></section><section><h4>If a 9th Crew Member is <em>NOT</em> Provided</h4><p>The CSM should inform the remaining operating crew and explain why a 9th Crew Member may not be available. If none is available, each operating crew member will receive the applicable approved short-crew credit shown below.</p></section></div><div class="protocol-credits"><h4>Short-Crew Credits</h4><table class="fdp-table protocol-credit-table"><thead><tr><th scope="col">Situation in the protocol</th><th scope="col">Credits per crew member</th></tr></thead><tbody><tr><th scope="row">Known delay: FDP exceeds 13 hours and no 9th Crew Member is provided when requested</th><td>28</td></tr><tr><th scope="row">Unknown delay: maximum FDP exceeds 13 h 15 min</th><td>28</td></tr><tr><th scope="row">Unknown delay: maximum FDP is less than 13 h 15 min</th><td>10</td></tr></tbody></table></div><section class="ninth-estimator" aria-labelledby="ninth-estimator-title"><span class="card-tag">ESTIMATE</span><h4 id="ninth-estimator-title">9th Crew Member Estimator</h4><p>Estimate overall duty time from crew report through estimated pushback, flight and arrival taxi.</p><div class="ninth-flight-route-fields"><label class="acclim-field"><span>Flight Number</span><select id="ninth-flight-number" aria-label="Flight Number"><option value="">Select flight number</option>${flightOptions}</select></label><label class="acclim-field"><span>Destination</span><select id="ninth-destination"><option value="">Select destination</option>${destinationOptions}</select></label></div><div class="ninth-estimator-fields"><label class="acclim-field"><span>Crew report time</span><input id="ninth-report-time" type="time" aria-label="Crew report time"></label><label class="acclim-field"><span>Estimated pushback time</span><input id="ninth-pushback-time" type="time" aria-label="Estimated pushback time"></label><fieldset class="flight-field ninth-flight-time"><legend>Flight time</legend><div><label><input id="ninth-flight-hours" type="number" min="0" max="30" step="1" inputmode="numeric" placeholder="0" aria-label="Flight time hours"><small>hours</small></label><b>:</b><label><input id="ninth-flight-minutes" type="number" min="0" max="59" step="1" inputmode="numeric" placeholder="00" aria-label="Flight time minutes"><small>minutes</small></label></div></fieldset></div><label class="acclim-field ninth-extra-field"><span>Additional information (optional)</span><textarea id="ninth-extra-info" rows="3" placeholder="Add details to include in the request"></textarea></label><p class="ninth-estimator-assumption">This estimator includes an average 15-minute taxi time for departure and arrival. It is not a Maximum FDP calculator.</p><div id="ninth-estimator-result" class="ninth-estimator-result" role="status" aria-live="polite" hidden></div><button class="ninth-reset-button" id="ninth-reset-calculator" type="button">Reset Calculator</button></section><small class="fdp-source-note">Protocol dated 14 December 2018 · addendum dated 12 September 2019.</small></article>`;
 }
 
 function updateNinthCrewEstimate() {
@@ -475,13 +502,13 @@ function updateNinthCrewEstimate() {
   let state, resultMessage, callButton = '', emailButton = '';
   if (estimatedDuration < 12 * 60 + 45) {
     state = 'green';
-    resultMessage = `Your estimated FDP will be ${durationText}. Therefore, it is unlikely that you will require a 9th Crew Member.`;
+    resultMessage = `Your estimated duty time will be ${durationText}. Therefore, it is unlikely that you will require a 9th Crew Member.`;
   } else if (estimatedDuration < 13 * 60) {
     state = 'amber';
-    resultMessage = `Your estimated FDP will be ${durationText}. Therefore, if you encounter further delays you may require a 9th Crew Member. Revise your estimates as more information becomes available.`;
+    resultMessage = `Your estimated duty time will be ${durationText}. Therefore, if you encounter further delays you may require a 9th Crew Member. Revise your estimates as more information becomes available.`;
   } else {
     state = 'red';
-    resultMessage = `Your estimated FDP will be ${durationText}. Therefore, per protocol, you should request a 9th Crew Member. You can call or email Inflight Operations below to provide them with the information.`;
+    resultMessage = `Your estimated duty time will be ${durationText}. Therefore, per protocol, you should request a 9th Crew Member. You can call or email Inflight Operations below to provide them with the information.`;
     callButton = '<a class="ninth-call-button" href="tel:+35318868600">Call Inflight Operations</a>';
     const emailAddress = (data.usefulContacts || []).find(contact => contact.name === 'Inflight Operations')?.email || 'crewoperations@aerlingus.com';
     const flightNumberSelect = document.getElementById('ninth-flight-number');
@@ -498,7 +525,7 @@ function updateNinthCrewEstimate() {
       `Crew report time: ${reportTime}`,
       `Estimated pushback time: ${pushbackTime}`,
       `Flight time: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`,
-      `Estimated FDP: ${durationText}`,
+      `Estimated duty time: ${durationText}`,
       `Estimated Chox On: ${finishTime}${nextDay}`, '',
       
       `Additional information: ${extraInfo}`, '',
@@ -525,7 +552,7 @@ function renderDestinations() {
 
 function renderDestinationProfile(destination) {
   const facts = data.destinationFacts.map((fact, index) => ({ ...fact, searchIndex: index })).filter(fact => fact.code === destination.code);
-  const metadata = `<div class="profile-meta"><div><span>TIME AT DUBLIN</span><strong id="dublin-current-time">Calculating…</strong></div><div><span>TIME AT DESTINATION</span><strong id="destination-current-time">Calculating…</strong></div><div><span>CURRENT WEATHER AT AIRPORT</span><strong id="destination-weather" aria-live="polite">Loading weather…</strong><small class="weather-attribution">Weather by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></small></div></div>`;
+  const metadata = `<div class="profile-meta"><div><span>TIME AT DUBLIN</span><strong id="dublin-current-time">Calculating…</strong></div><div><span>TIME AT DESTINATION</span><strong id="destination-current-time">Calculating…</strong></div><div><span>CURRENT WEATHER AT AIRPORT</span><strong id="destination-weather" aria-live="polite">Loading weather…</strong><small class="weather-attribution">Weather by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></small></div></div><p class="destination-freshness">Source: destination source register · Checked ${escapeHtml(data.informationLastUpdated || 'date unknown')}. Record confidence: unknown unless the record itself states otherwise.</p>`;
   if (!facts.length) {
     return metadata + `<div class="empty"><strong>No destination details entered yet</strong>This location is present in the destination index, but the source register has no detailed records for it.</div>`;
   }
@@ -695,6 +722,10 @@ async function updateDestinationWeather(destination) {
     if (output) output.textContent = 'Unavailable';
     return;
   }
+  if (navigator.onLine === false) {
+    output.textContent = 'Weather unavailable offline';
+    return;
+  }
   const cached = destinationWeatherCache.get(destination.code);
   if (cached && Date.now() - cached.time < 20 * 60 * 1000) {
     output.innerHTML = cached.html;
@@ -715,19 +746,20 @@ async function updateDestinationWeather(destination) {
     destinationWeatherCache.set(destination.code, { time: Date.now(), html });
     if (document.querySelector('#destination-weather') === output) output.innerHTML = html;
   } catch {
-    if (document.querySelector('#destination-weather') === output) output.textContent = 'Weather unavailable';
+    if (document.querySelector('#destination-weather') === output) output.textContent = navigator.onLine === false ? 'Weather unavailable offline' : 'Weather unavailable';
   }
 }
 
 function openDestination(code) {
   const destination = data.destinations.find(item => item.code === code);
   if (!destination) return;
+  setRoute(`destinations/${code}`);
   clearInterval(destinationClockTimer);
   setActive('destinations');
   content.innerHTML = `<button class="back-button" data-back>← ALL DESTINATIONS</button>`
     + `<div class="destination-heading"><div class="destination-title-row"><h2>${escapeHtml(destination.name)}</h2><span class="destination-code" aria-label="Airport code ${escapeHtml(destination.code)}">${escapeHtml(destination.code)}</span></div><div class="destination-meta"><div><span>COUNTRY</span><strong>${escapeHtml(destination.country)}</strong></div><div><span>OPERATES</span><strong>${escapeHtml(destination.routeStatus)}</strong></div></div></div>`
     + renderDestinationProfile(destination);
-  content.querySelector('[data-back]').onclick = renderDestinations;
+  content.querySelector('[data-back]').onclick = () => openSection('destinations');
   updateDestinationClock(destination);
   destinationClockTimer = setInterval(() => updateDestinationClock(destination), 60_000);
 }
@@ -772,6 +804,8 @@ function renderAircraft() {
 function renderFlightInformation() {
   const destinationOptions = [{ name: 'Dublin', code: 'DUB' }, ...data.destinations].sort((a, b) => a.name.localeCompare(b.name))
     .map(destination => `<option value="${escapeHtml(destination.code)}">${escapeHtml(destination.name)} (${escapeHtml(destination.code)})</option>`).join('');
+  const originOptions = [...data.destinations].sort((a, b) => a.name.localeCompare(b.name))
+    .map(origin => `<option value="${escapeHtml(origin.code)}">${escapeHtml(origin.name)} (${escapeHtml(origin.code)})</option>`).join('');
   content.innerHTML = heading('', sections.flightInfo.title, sections.flightInfo.desc)
     + `<form class="flight-form" id="flight-information-form" autocomplete="off">
       <div class="flight-form-grid">
@@ -785,12 +819,13 @@ function renderFlightInformation() {
             <label class="flight-field"><span>No. of INF</span><input name="infants" type="number" min="0" inputmode="numeric" placeholder="0"></label>
             <label class="flight-field"><span>No. of PRM's</span><input name="prms" type="number" min="0" inputmode="numeric" placeholder="0"></label>
           </div>
-          <div class="passenger-total"><span>TOTAL PASSENGERS</span><strong id="passenger-total">0</strong></div>
+          <div class="passenger-total"><span>TOTAL PAX · INCLUDES INFANTS</span><strong id="passenger-total">0</strong></div>
         </section>
         <section class="flight-panel"><div class="flight-panel-head"><h3>Destination &amp; Timings</h3></div>
           <div class="flight-fields">
             <label class="flight-field"><span>Destination</span><select name="destination"><option value="">Select destination</option>${destinationOptions}</select></label>
-            <div class="flight-field pushback-time-field"><label for="pushback-time">Push Back Time (Dublin local)</label><input id="pushback-time" name="pushback" type="datetime-local"><button class="current-time-button" type="button" id="use-current-pushback-time">Use current time</button></div>
+            <label class="flight-field" id="origin-airport-wrap" hidden><span>Origin airport</span><select name="originAirport" id="origin-airport"><option value="">Select origin airport</option>${originOptions}</select></label>
+            <div class="flight-field pushback-time-field"><label for="pushback-time">Pushback time</label><input id="pushback-time" name="pushback" type="datetime-local" aria-describedby="pushback-time-zone"><small id="pushback-time-zone" role="status" aria-live="polite">Time zone used: Dublin (Europe/Dublin)</small><button class="current-time-button" type="button" id="use-current-pushback-time">Use current time</button></div>
             <div class="flight-duration-pair">
               <label class="flight-field taxi-minutes-field"><span>Taxi (mins)</span><input name="taxiMinutes" type="number" min="1" step="1" inputmode="numeric" placeholder="0"></label>
               <fieldset class="flight-field duration-field"><legend>Flight Time</legend><div><label><input name="flightHours" type="number" min="0" max="30" inputmode="numeric" placeholder="0"><small>hours</small></label><b>:</b><label><input name="flightMinutes" type="number" min="0" max="59" inputmode="numeric" placeholder="00"><small>minutes</small></label></div></fieldset>
@@ -804,7 +839,7 @@ function renderFlightInformation() {
           </div>
         </section>
       </div>
-      <div class="flight-form-footer"><small id="flight-save-status" role="status">Entries stay in this page only and are cleared when you leave.</small><button class="clear-flight-button" type="button" id="clear-flight-information">Clear Flight Information</button></div>
+      <div class="flight-form-footer"><small id="flight-save-status" role="status">Entries stay in this page only and are cleared when you leave. PRMs are recorded separately and are not included in passenger total.</small><div class="flight-footer-actions"><button class="clear-flight-button" type="button" id="copy-flight-information">Copy Flight Summary</button><button class="clear-flight-button" type="button" id="clear-flight-information">Clear Flight Information</button></div></div>
     </form>`;
 
   const form = content.querySelector('#flight-information-form');
@@ -836,8 +871,24 @@ function renderFlightInformation() {
     const hasTaxiTime = form.elements.taxiMinutes.value !== '';
     const estimatedDublin = content.querySelector('#estimated-arrival-dublin');
     const estimatedDestination = content.querySelector('#estimated-arrival-destination');
+    const originWrap = content.querySelector('#origin-airport-wrap');
+    const originAirport = form.elements.originAirport;
+    const pushbackTimeZone = content.querySelector('#pushback-time-zone');
+    const isDublinDestination = form.elements.destination.value === 'DUB';
+    originWrap.hidden = !isDublinDestination;
+    originAirport.required = isDublinDestination;
+    if (!isDublinDestination) originAirport.value = '';
     const destination = data.destinations.find(item => item.code === form.elements.destination.value)
       || (form.elements.destination.value === 'DUB' ? { name: 'Dublin', code: 'DUB' } : null);
+    const origin = data.destinations.find(item => item.code === originAirport.value);
+    const pushbackZone = isDublinDestination ? destinationTimeZones[originAirport.value] : 'Europe/Dublin';
+    const pushbackZoneLabel = isDublinDestination
+      ? (origin && pushbackZone ? `${origin.name} (${pushbackZone})` : '')
+      : `Dublin (${pushbackZone})`;
+    pushbackTimeZone.textContent = pushbackZoneLabel
+      ? `Time zone used: ${pushbackZoneLabel}`
+      : 'Select an origin airport to set the pushback time zone.';
+    content.querySelector('#use-current-pushback-time').disabled = !pushbackZone;
     content.querySelector('#destination-arrival-label').textContent = destination
       ? `ESTIMATED ARRIVAL · ${destination.name.toUpperCase()} LOCAL TIME`
       : 'DESTINATION LOCAL TIME';
@@ -848,13 +899,19 @@ function renderFlightInformation() {
       return;
     }
 
+    if (!pushbackZone) {
+      estimatedDublin.textContent = 'Select an origin airport to set the pushback time zone';
+      estimatedDestination.textContent = 'Select an origin airport to set the pushback time zone';
+      return;
+    }
+
     if (!pushbackValue || !hasFlightTime || !hasTaxiTime) {
       estimatedDublin.textContent = 'Enter the required times';
       estimatedDestination.textContent = destination ? 'Enter timings to calculate' : 'Select destination';
       return;
     }
 
-    const pushback = new Date(pushbackValue);
+    const pushback = wallTimeToDate(pushbackValue, pushbackZone);
     const invalidDuration = flightHours < 0 || flightHours > 30 || flightMinutes < 0 || flightMinutes > 59
       || taxiMinutes < 1 || !Number.isInteger(taxiMinutes);
     if (!Number.isFinite(pushback.getTime()) || invalidDuration) {
@@ -875,14 +932,22 @@ function renderFlightInformation() {
       : 'Select destination';
   };
 
-  form.addEventListener('input', () => {
+  const handleFlightInput = () => {
     capPassengerCounts();
     updateFlightSummary();
-  });
+  };
+  form.addEventListener('input', handleFlightInput);
+  form.addEventListener('change', handleFlightInput);
   content.querySelector('#use-current-pushback-time').addEventListener('click', () => {
+    const selectedZone = form.elements.destination.value === 'DUB'
+      ? destinationTimeZones[form.elements.originAirport.value]
+      : 'Europe/Dublin';
+    if (!selectedZone) return;
     const now = new Date();
     const pad = value => String(value).padStart(2, '0');
-    form.elements.pushback.value = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    const parts = new Intl.DateTimeFormat('en-CA', { timeZone: selectedZone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(now);
+    const part = type => parts.find(item => item.type === type)?.value;
+    form.elements.pushback.value = `${part('year')}-${part('month')}-${part('day')}T${pad(Number(part('hour')))}:${pad(Number(part('minute')))}`;
     form.elements.pushback.dispatchEvent(new Event('input', { bubbles: true }));
   });
   window.addEventListener('pagehide', () => form.reset(), { once: true });
@@ -893,12 +958,67 @@ function renderFlightInformation() {
     saveStatus.textContent = 'Flight information cleared from this page.';
     updateFlightSummary();
   });
+  content.querySelector('#copy-flight-information').addEventListener('click', async () => {
+    const values = Object.fromEntries(new FormData(form).entries());
+    const destination = data.destinations.find(item => item.code === values.destination)?.name || values.destination || 'Not selected';
+    const summary = [
+      'AerKit Flight Summary', `Destination: ${destination}`,
+      ...(values.originAirport ? [`Origin: ${data.destinations.find(item => item.code === values.originAirport)?.name || values.originAirport}`] : []),
+      `Passengers (including infants): ${content.querySelector('#passenger-total').textContent}`,
+      `Infants: ${values.infants || '0'} · PRMs (separate): ${values.prms || '0'}`,
+      `Pushback: ${values.pushback || 'Not entered'} · ${content.querySelector('#pushback-time-zone').textContent.replace(/^Time zone used: /, '')}`,
+      `Taxi: ${values.taxiMinutes ? `${values.taxiMinutes} minutes` : 'Not entered'}`,
+      `Flight time: ${values.flightHours || '0'}h ${values.flightMinutes || '0'}m`,
+      `Estimated arrival Dublin: ${content.querySelector('#estimated-arrival-dublin').textContent}`,
+      `Estimated arrival destination: ${content.querySelector('#estimated-arrival-destination').textContent}`,
+      ...(values.flightInformation ? [`Flight notes: ${values.flightInformation}`] : [])
+    ].join('\n');
+    try {
+      await navigator.clipboard.writeText(summary);
+      saveStatus.textContent = 'Flight summary copied to clipboard.';
+    } catch {
+      saveStatus.textContent = 'Clipboard unavailable. Select and copy the flight details manually.';
+    }
+  });
 }
 
-function openSection(id) {
+function wallTimeToDate(value, timeZone) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value);
+  if (!match) return new Date(NaN);
+  const [, year, month, day, hour, minute] = match.map(Number);
+  const wallAsUtc = Date.UTC(year, month - 1, day, hour, minute);
+  const offsetAt = instant => {
+    const parts = new Intl.DateTimeFormat('en-GB', { timeZone, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit', hourCycle:'h23' }).formatToParts(new Date(instant));
+    const fields = Object.fromEntries(parts.filter(part => part.type !== 'literal').map(part => [part.type, Number(part.value)]));
+    return Date.UTC(fields.year, fields.month - 1, fields.day, fields.hour, fields.minute, fields.second) - Math.floor(instant / 1000) * 1000;
+  };
+  let utc = wallAsUtc - offsetAt(wallAsUtc);
+  utc = wallAsUtc - offsetAt(utc);
+  return new Date(utc);
+}
+
+function setRoute(route) {
+  const hash = route ? `#/${route}` : '#/';
+  if (window.location.hash !== hash) window.location.hash = hash;
+}
+
+function renderRoute() {
+  const parts = window.location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+  if (parts[0] === 'destinations' && parts[1]) {
+    if (data.destinations.some(item => item.code === parts[1])) openDestination(parts[1]);
+    else openSection('destinations', false);
+    return;
+  }
+  const section = parts[0] && sections[parts[0]] ? parts[0] : 'essentials';
+  openSection(section, false);
+}
+
+function openSection(id, updateRoute = true) {
+  if (updateRoute) setRoute(id === 'essentials' ? '' : id);
   setSectionMenuOpen(false);
   clearInterval(destinationClockTimer);
   setActive(id);
+  if (id === 'essentials') return renderCrewEssentials();
   if (id === 'destinations') return renderDestinations();
   if (id === 'aircraft') return renderAircraft();
   if (id === 'flightInfo') return renderFlightInformation();
@@ -918,6 +1038,18 @@ function openSection(id) {
     initOvernightAllowances();
   }
   if (id === 'roster') initBidWindowsCard();
+}
+
+function renderCrewEssentials() {
+  const links = [
+    ['FLIGHT CALCULATOR', 'Enter Flight Information', 'Passenger totals, arrival time estimate and flight notes.', 'flightInfo'],
+    ['DESTINATIONS', 'Open Destination Information', 'Airport, hotel, transport details and station contacts.', 'destinations'],
+    ['FLIGHT & DUTY', 'Check Duty References', 'Basic FDP, acclimatisation and ninth crew member guidance.', 'flight'],
+    ['CREW RESOURCES', 'Open useful links and contacts', 'Company resources, forms, telephone and email contacts.', 'contacts']
+  ];
+  content.innerHTML = heading('QUICK ACCESS', sections.essentials.title, sections.essentials.desc)
+    + `<div class="card-grid essentials-grid">${links.map(([tag, title, detail, section]) => `<button type="button" class="card essentials-card" data-essential="${section}"><span class="card-tag">${tag}</span><h3>${title}</h3><p>${detail}</p><span class="essentials-open">Open →</span></button>`).join('')}</div>`;
+  content.querySelectorAll('[data-essential]').forEach(button => button.addEventListener('click', () => openSection(button.dataset.essential)));
 }
 
 document.querySelectorAll('.quick-links button').forEach(button => {
@@ -941,7 +1073,7 @@ document.addEventListener('keydown', event => {
 
 document.querySelector('.home-button').addEventListener('click', event => {
   event.preventDefault();
-  openSection('flightInfo');
+  openSection('essentials');
   content.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 
@@ -980,14 +1112,17 @@ function showResults(query) {
     grouped.get(group).push(item);
   });
   results.innerHTML = matches.length
-    ? [...grouped.entries()].map(([group, items]) => `<div class="search-result-group"><div class="search-result-heading">${escapeHtml(group)}</div>${items.map(item => `<button class="result" data-index="${searchable.indexOf(item)}"><span class="result-tag">${escapeHtml(item.tag)}</span><span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.detail)}</small></span></button>`).join('')}</div>`).join('')
+    ? [...grouped.entries()].map(([group, items]) => `<div class="search-result-group"><div class="search-result-heading">${escapeHtml(group)}</div>${items.map(item => `<button class="result" role="option" aria-label="${escapeHtml(`${item.title}, ${item.tag}. ${item.detail}`)}" data-index="${searchable.indexOf(item)}"><span class="result-tag">${escapeHtml(item.tag)}</span><span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.detail)}</small></span></button>`).join('')}</div>`).join('')
     : '<div class="result"><span><strong>No matches</strong><small>Try a destination, aircraft registration or topic.</small></span></div>';
   results.hidden = false;
+  results.setAttribute('role', 'region');
+  results.setAttribute('aria-label', `${matches.length} search results`);
   results.querySelectorAll('[data-index]').forEach(button => button.onclick = () => {
     const item = searchable[Number(button.dataset.index)];
     openSection(item.id);
     if (item.destinationCode) openDestination(item.destinationCode);
     results.hidden = true;
+    search.setAttribute('aria-expanded', 'false');
     search.value = '';
     content.scrollIntoView({ behavior: 'smooth', block: 'start' });
     if (item.targetId) requestAnimationFrame(() => document.getElementById(item.targetId)?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
@@ -995,13 +1130,44 @@ function showResults(query) {
   });
 }
 
-search.addEventListener('input', () => showResults(search.value));
-document.addEventListener('click', event => { if (!event.target.closest('.search-wrap')) results.hidden = true; });
+search.setAttribute('aria-controls', 'search-results');
+search.setAttribute('aria-expanded', 'false');
+search.addEventListener('input', () => { showResults(search.value); search.setAttribute('aria-expanded', String(!results.hidden)); });
+search.addEventListener('keydown', event => {
+  if (!['ArrowDown', 'ArrowUp', 'Enter'].includes(event.key)) return;
+  const options = [...results.querySelectorAll('button[data-index]')];
+  if (!options.length) return;
+  const current = options.indexOf(document.activeElement);
+  if (event.key === 'Enter') { event.preventDefault(); options[current >= 0 ? current : 0].click(); return; }
+  event.preventDefault();
+  const next = current < 0 ? (event.key === 'ArrowUp' ? options.length - 1 : 0) : (current + (event.key === 'ArrowUp' ? options.length - 1 : 1)) % options.length;
+  options[next].focus();
+});
+document.addEventListener('click', event => {
+  if (!event.target.closest('.search-wrap')) {
+    results.hidden = true;
+    search.setAttribute('aria-expanded', 'false');
+  }
+});
 document.addEventListener('keydown', event => {
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); search.focus(); }
-  if (event.key === 'Escape') { results.hidden = true; search.blur(); }
+  if (event.key === 'Escape') { results.hidden = true; search.setAttribute('aria-expanded', 'false'); search.blur(); }
 });
-openSection('flightInfo');
+window.addEventListener('hashchange', renderRoute);
+window.addEventListener('offline', () => {
+  const destinationCode = window.location.hash.match(/^#\/destinations\/([^/]+)/)?.[1];
+  const destination = data.destinations.find(item => item.code === destinationCode);
+  if (destination) updateDestinationWeather(destination);
+});
+window.addEventListener('online', () => {
+  const destinationCode = window.location.hash.match(/^#\/destinations\/([^/]+)/)?.[1];
+  const destination = data.destinations.find(item => item.code === destinationCode);
+  if (destination) {
+    destinationWeatherCache.delete(destination.code);
+    updateDestinationWeather(destination);
+  }
+});
+renderRoute();
 
 let installPrompt;
 const installButton = document.querySelector('#install-button');
@@ -1014,4 +1180,27 @@ installButton.addEventListener('click', async () => {
   installButton.hidden = true;
 });
 
-if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(() => {}));
+if ('serviceWorker' in navigator) {
+  const syncStatus = document.querySelector('#sync-status');
+  navigator.serviceWorker.addEventListener('message', event => {
+    if (event.data?.type !== 'CACHE_STATUS') return;
+    if (!event.data.ready) {
+      syncStatus.textContent = 'Offline references unavailable';
+      return;
+    }
+    const synced = event.data.syncedAt ? new Date(event.data.syncedAt) : null;
+    const label = synced && Number.isFinite(synced.getTime())
+      ? new Intl.DateTimeFormat('en-IE', { dateStyle: 'medium', timeStyle: 'short' }).format(synced)
+      : 'time unknown';
+    syncStatus.textContent = `Offline references ready · Last sync ${label}`;
+  });
+  window.addEventListener('load', async () => {
+    try {
+      await navigator.serviceWorker.register('./service-worker.js');
+      const registration = await navigator.serviceWorker.ready;
+      (navigator.serviceWorker.controller || registration.active)?.postMessage('GET_CACHE_STATUS');
+    } catch {
+      syncStatus.textContent = 'Offline references not available';
+    }
+  });
+}
