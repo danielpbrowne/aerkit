@@ -1,9 +1,9 @@
 const data = window.CSM_DATA;
-const informationUpdated = document.querySelector('#information-updated');
-if (informationUpdated && data.informationLastUpdated) {
+const informationValidFrom = document.querySelector('#information-valid-from');
+if (informationValidFrom && data.informationLastUpdated) {
   const updatedDate = new Date(`${data.informationLastUpdated}T00:00:00Z`);
   if (Number.isFinite(updatedDate.getTime())) {
-    informationUpdated.textContent = `Info updated: ${new Intl.DateTimeFormat('en-IE', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(updatedDate)}`;
+    informationValidFrom.textContent = `Information Valid From: ${new Intl.DateTimeFormat('en-IE', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(updatedDate)}`;
   }
 }
 
@@ -284,7 +284,7 @@ function initOvernightAllowances() {
 function renderCreditDatesCard() {
   const options = (data.creditPeriods || []).map(period => `<option value="${escapeHtml(period.period)}">${escapeHtml(period.period)}</option>`).join('');
   return `<article class="card credit-dates-card"><span class="card-tag">CREDITS</span><h3>Credits &amp; Payment Dates</h3>
-    <p>Select a pay period to view its payroll and credit dates. Credits current value is <strong>€5.83</strong>.</p>
+    <p>Select a pay period to view its payroll and credit dates. Current Credit Value: <strong>€5.83</strong>.</p>
     <label class="flight-field credit-period-control"><span>Pay Period</span><select id="credit-period-select"><option value="">Select pay period</option>${options}</select></label>
     <div id="credit-period-details" class="credit-period-details" hidden></div>
   </article>`;
@@ -373,7 +373,7 @@ const basicFdpRows = [
 
 function renderBasicFdpCard(card) {
   const reportOptions = basicFdpRows.map(([reportTime], index) => `<option value="${index}">${reportTime}</option>`).join('');
-  return `<article class="card fdp-card"><span class="card-tag">${escapeHtml(card[0])}</span><h3>${escapeHtml(card[1])}</h3><p>Select your report-time band, then choose the number of sectors to be operated to calculate your maximum FDP.<br><br>Refer to Acclimatisation Checker below if you are starting your Duty away from your Home Base.</p><form class="acclim-checker" id="basic-fdp-checker"><label class="acclim-field"><span>Report time (reference time)</span><select name="reportTime" required><option value="">Select report-time band</option>${reportOptions}</select></label><label class="acclim-field"><span>Sectors operated</span><select name="sectors" required><option value="">Select sectors</option><option value="1">1–2 sectors</option><option value="2">3 sectors</option><option value="3">4 sectors</option></select></label><div class="acclim-actions"><button class="acclim-calculate" type="submit">Check maximum FDP</button><button class="acclim-reset" type="reset">Reset</button></div><div class="acclim-result fdp-basic-result" id="basic-fdp-result" role="status" aria-live="polite" hidden></div></form><p class="acclim-note">This is a basic FDP estimate. Check acclimatisation and current company rules before using it.</p></article>`;
+  return `<article class="card fdp-card"><span class="card-tag">${escapeHtml(card[0])}</span><h3>${escapeHtml(card[1])}</h3><p>Pick your report-time band, then the number of sectors to be operated. This will calculate your <strong>basic</strong> maximum FDP allowable under EASA FTL's.</p><p class="fdp-acclim-prompt">Check Acclimatisation state below if you are starting your Duty away from your Home Base after 48hrs from your starting report time.</p><form class="acclim-checker" id="basic-fdp-checker"><label class="acclim-field"><span>Report time (reference time)</span><select name="reportTime" required><option value="">Select report-time band</option>${reportOptions}</select></label><label class="acclim-field"><span>Sectors operated</span><select name="sectors" required><option value="">Select sectors</option><option value="1">1–2 sectors</option><option value="2">3 sectors</option><option value="3">4 sectors</option></select></label><div class="acclim-actions"><button class="acclim-calculate" type="submit">Check maximum FDP</button><button class="acclim-reset" type="reset">Reset</button></div><div class="acclim-result fdp-basic-result" id="basic-fdp-result" role="status" aria-live="polite" hidden></div></form><p class="acclim-note">This is a basic FDP estimate. Ensure all collective agreements are also followed and applied where necessary.</p></article>`;
 }
 
 function renderAcclimatisationCard(card) {
@@ -420,15 +420,35 @@ content.addEventListener('reset', event => {
   result.textContent = '';
 });
 content.addEventListener('input', event => {
-  if (['ninth-report-time', 'ninth-pushback-time', 'ninth-flight-number', 'ninth-flight-hours', 'ninth-flight-minutes', 'ninth-extra-info'].includes(event.target.id)) updateNinthCrewEstimate();
+  if (['ninth-report-time', 'ninth-pushback-time', 'ninth-flight-hours', 'ninth-flight-minutes', 'ninth-extra-info'].includes(event.target.id)) updateNinthCrewEstimate();
+});
+content.addEventListener('click', event => {
+  const resetButton = event.target.closest('#ninth-reset-calculator');
+  if (!resetButton) return;
+  const estimator = resetButton.closest('.ninth-estimator');
+  estimator.querySelectorAll('input, select, textarea').forEach(field => { field.value = ''; });
+  updateNinthCrewEstimate();
+  estimator.querySelector('#ninth-flight-number')?.focus();
 });
 content.addEventListener('change', event => {
-  if (event.target.id === 'ninth-destination') updateNinthCrewEstimate();
+  if (event.target.id === 'ninth-flight-number') {
+    const flight = event.target.value === '' ? null : data.flightSchedule[Number(event.target.value)];
+    const destination = document.getElementById('ninth-destination');
+    if (destination) destination.value = flight?.destinationCode || '';
+    updateNinthCrewEstimate();
+  }
+  if (event.target.id === 'ninth-destination') {
+    const flightSelect = document.getElementById('ninth-flight-number');
+    const flight = flightSelect?.value === '' ? null : data.flightSchedule[Number(flightSelect?.value)];
+    if (flight && flight.destinationCode !== event.target.value) flightSelect.value = '';
+    updateNinthCrewEstimate();
+  }
 });
 
 function renderNinthCrewCard(card) {
   const destinationOptions = [...data.destinations].sort((a, b) => a.name.localeCompare(b.name)).map(destination => `<option value="${escapeHtml(destination.code)}">${escapeHtml(destination.name)} (${escapeHtml(destination.code)})</option>`).join("");
-  return `<article class="card fdp-card"><span class="card-tag">${escapeHtml(card[0])}</span><h3>${escapeHtml(card[1])}</h3><p>The 9th Crew Member Protocol applies to transatlantic flights when it becomes apparent that the FDP will exceed 13 hours.</p><div class="protocol-steps"><section><h4>Starting the Process</h4><p>When this is known, the CSM / No. 1 should liaise with the on-duty Operations Crew Manager (OCM) and Crew Control to advise them that a 9th Crew Member is required.</p></section><section><h4>Required Information</h4><p>When contacting the OCM and Crew Control, provide all relevant information available, such as:</p><ul class="protocol-info-list"><li>Nature of the delay</li><li>Expected duration of the delay</li><li>Planned flight time</li><li>Planned taxi time for departure and arrival</li><li>Any other relevant information</li></ul></section><section><h4>When the ninth is provided</h4><p>The ninth crew member is surplus to the operating crew and should be used to support in-flight rest. Duty and rest should remain balanced among the operating cabin crew.</p></section><section><h4>If a 9th Crew Member is <em>NOT</em> Provided</h4><p>The CSM should inform the remaining operating crew and explain why a 9th Crew Member may not be available. If none is available, each operating crew member will receive the applicable approved short-crew credit shown below.</p></section><section><h4>Short-Crew Credits</h4><div class="fdp-table-scroll"><table class="fdp-table protocol-credit-table"><thead><tr><th scope="col">Situation in the protocol</th><th scope="col">Credits per crew member</th></tr></thead><tbody><tr><th scope="row">Known delay: FDP exceeds 13 hours and no 9th Crew Member is provided when requested</th><td>28</td></tr><tr><th scope="row">Unknown delay: maximum FDP exceeds 13 h 15 min</th><td>28</td></tr><tr><th scope="row">Unknown delay: maximum FDP is less than 13 h 15 min</th><td>10</td></tr></tbody></table></div></section></div><section class="ninth-estimator" aria-labelledby="ninth-estimator-title"><span class="card-tag">ESTIMATE</span><h4 id="ninth-estimator-title">Do I Need a 9th Calculator?</h4><p>Estimate the FDP from crew report through estimated pushback, flight and arrival taxi.</p><div class="ninth-flight-route-fields"><label class="acclim-field"><span>Flight Number</span><input id="ninth-flight-number" type="text" autocomplete="off" placeholder="e.g. EI123" aria-label="Flight Number"></label><label class="acclim-field"><span>Destination</span><select id="ninth-destination"><option value="">Select destination</option>${destinationOptions}</select></label></div><div class="ninth-estimator-fields"><label class="acclim-field"><span>Crew report time</span><input id="ninth-report-time" type="time" aria-label="Crew report time"></label><label class="acclim-field"><span>Estimated pushback time</span><input id="ninth-pushback-time" type="time" aria-label="Estimated pushback time"></label><fieldset class="flight-field ninth-flight-time"><legend>Flight time</legend><div><label><input id="ninth-flight-hours" type="number" min="0" max="30" step="1" inputmode="numeric" placeholder="0" aria-label="Flight time hours"><small>hours</small></label><b>:</b><label><input id="ninth-flight-minutes" type="number" min="0" max="59" step="1" inputmode="numeric" placeholder="00" aria-label="Flight time minutes"><small>minutes</small></label></div></fieldset></div><label class="acclim-field ninth-extra-field"><span>Additional information (optional)</span><textarea id="ninth-extra-info" rows="3" placeholder="Add details to include in the request"></textarea></label><p class="ninth-estimator-assumption">Estimate includes 15 minutes for departure taxi and 15 minutes for arrival taxi. Enter report and pushback times using the same Dublin time.</p><div id="ninth-estimator-result" class="ninth-estimator-result" role="status" aria-live="polite" hidden></div></section><small class="fdp-source-note">Protocol dated 14 December 2018 · addendum dated 12 September 2019.</small></article>`;
+  const flightOptions = data.flightSchedule.map((flight, index) => `<option value="${index}">${escapeHtml(flight.flightNumber)}</option>`).join('');
+  return `<article class="card fdp-card"><span class="card-tag">${escapeHtml(card[0])}</span><h3>${escapeHtml(card[1])}</h3><p>The 9th Crew Member Protocol applies to transatlantic flights when it becomes apparent that the FDP will exceed 13 hours.</p><div class="protocol-steps"><section><h4>Starting the Process</h4><p>When this is known, the CSM / No. 1 should liaise with the on-duty Operations Crew Manager (OCM) and Crew Control to advise them that a 9th Crew Member is required.</p></section><section><h4>Required Information</h4><p>When contacting the OCM and Crew Control, provide all relevant information available, such as:</p><ul class="protocol-info-list"><li>Nature of the delay</li><li>Expected duration of the delay</li><li>Planned flight time</li><li>Planned taxi time for departure and arrival</li><li>Any other relevant information</li></ul></section><section><h4>When the ninth is provided</h4><p>The ninth crew member is surplus to the operating crew and should be used to support in-flight rest. Duty and rest should remain balanced among the operating cabin crew.</p></section><section><h4>If a 9th Crew Member is <em>NOT</em> Provided</h4><p>The CSM should inform the remaining operating crew and explain why a 9th Crew Member may not be available. If none is available, each operating crew member will receive the applicable approved short-crew credit shown below.</p></section></div><div class="protocol-credits"><h4>Short-Crew Credits</h4><table class="fdp-table protocol-credit-table"><thead><tr><th scope="col">Situation in the protocol</th><th scope="col">Credits per crew member</th></tr></thead><tbody><tr><th scope="row">Known delay: FDP exceeds 13 hours and no 9th Crew Member is provided when requested</th><td>28</td></tr><tr><th scope="row">Unknown delay: maximum FDP exceeds 13 h 15 min</th><td>28</td></tr><tr><th scope="row">Unknown delay: maximum FDP is less than 13 h 15 min</th><td>10</td></tr></tbody></table></div><section class="ninth-estimator" aria-labelledby="ninth-estimator-title"><span class="card-tag">ESTIMATE</span><h4 id="ninth-estimator-title">Do I Need a 9th Calculator?</h4><p>Estimate the FDP from crew report through estimated pushback, flight and arrival taxi.</p><div class="ninth-flight-route-fields"><label class="acclim-field"><span>Flight Number</span><select id="ninth-flight-number" aria-label="Flight Number"><option value="">Select flight number</option>${flightOptions}</select></label><label class="acclim-field"><span>Destination</span><select id="ninth-destination"><option value="">Select destination</option>${destinationOptions}</select></label></div><div class="ninth-estimator-fields"><label class="acclim-field"><span>Crew report time</span><input id="ninth-report-time" type="time" aria-label="Crew report time"></label><label class="acclim-field"><span>Estimated pushback time</span><input id="ninth-pushback-time" type="time" aria-label="Estimated pushback time"></label><fieldset class="flight-field ninth-flight-time"><legend>Flight time</legend><div><label><input id="ninth-flight-hours" type="number" min="0" max="30" step="1" inputmode="numeric" placeholder="0" aria-label="Flight time hours"><small>hours</small></label><b>:</b><label><input id="ninth-flight-minutes" type="number" min="0" max="59" step="1" inputmode="numeric" placeholder="00" aria-label="Flight time minutes"><small>minutes</small></label></div></fieldset></div><label class="acclim-field ninth-extra-field"><span>Additional information (optional)</span><textarea id="ninth-extra-info" rows="3" placeholder="Add details to include in the request"></textarea></label><p class="ninth-estimator-assumption">Estimate includes 15 minutes for departure taxi and 15 minutes for arrival taxi. Enter report and pushback times using the same Dublin time.</p><div id="ninth-estimator-result" class="ninth-estimator-result" role="status" aria-live="polite" hidden></div><button class="ninth-reset-button" id="ninth-reset-calculator" type="button">Reset Calculator</button></section><small class="fdp-source-note">Protocol dated 14 December 2018 · addendum dated 12 September 2019.</small></article>`;
 }
 
 function updateNinthCrewEstimate() {
@@ -472,7 +492,9 @@ function updateNinthCrewEstimate() {
     resultMessage = `Your estimated FDP will be ${durationText}. Therefore, per protocol, you should request a 9th Crew Member. You can call or email Inflight Operations below to provide them with the information.`;
     callButton = '<a class="ninth-call-button" href="tel:+35318868600">Call Inflight Operations</a>';
     const emailAddress = (data.usefulContacts || []).find(contact => contact.name === 'Inflight Operations')?.email || 'crewoperations@aerlingus.com';
-    const flightNumber = document.getElementById('ninth-flight-number')?.value.trim() || 'Not entered';
+    const flightNumberSelect = document.getElementById('ninth-flight-number');
+    const selectedFlight = flightNumberSelect?.value === '' ? null : data.flightSchedule[Number(flightNumberSelect?.value)];
+    const flightNumber = selectedFlight?.flightNumber || 'Not entered';
     const destinationCode = document.getElementById('ninth-destination')?.value;
     const destination = data.destinations.find(item => item.code === destinationCode);
     const extraInfo = document.getElementById('ninth-extra-info')?.value.trim() || 'None provided';
@@ -504,7 +526,7 @@ function renderDestinations() {
   const list = [...data.destinations].sort((a, b) => a.name.localeCompare(b.name)).map(destination => {
     return `<button class="destination" data-destination="${escapeHtml(destination.code)}"><strong>${escapeHtml(destination.name)}</strong><span>${escapeHtml(destination.code)}</span></button>`;
   }).join('');
-  content.innerHTML = heading('DESTINATIONS', sections.destinations.title, sections.destinations.desc)
+  content.innerHTML = heading('', sections.destinations.title, sections.destinations.desc)
     + `<div class="destination-list">${list}</div>`;
   content.querySelectorAll('[data-destination]').forEach(button => button.onclick = () => openDestination(button.dataset.destination));
 }
@@ -711,7 +733,7 @@ function openDestination(code) {
   clearInterval(destinationClockTimer);
   setActive('destinations');
   content.innerHTML = `<button class="back-button" data-back>← ALL DESTINATIONS</button>`
-    + `<div class="destination-heading"><div><span class="section-kicker">${escapeHtml(destination.code)} · OUTSTATION</span><h2>${escapeHtml(destination.name)}</h2></div><div class="destination-meta"><div><span>COUNTRY</span><strong>${escapeHtml(destination.country)}</strong></div><div><span>OPERATES</span><strong>${escapeHtml(destination.routeStatus)}</strong></div></div></div>`
+    + `<div class="destination-heading"><div class="destination-title-row"><h2>${escapeHtml(destination.name)}</h2><span class="destination-code" aria-label="Airport code ${escapeHtml(destination.code)}">${escapeHtml(destination.code)}</span></div><div class="destination-meta"><div><span>COUNTRY</span><strong>${escapeHtml(destination.country)}</strong></div><div><span>OPERATES</span><strong>${escapeHtml(destination.routeStatus)}</strong></div></div></div>`
     + renderDestinationProfile(destination);
   content.querySelector('[data-back]').onclick = renderDestinations;
   updateDestinationClock(destination);
@@ -749,9 +771,9 @@ function renderAircraft() {
       return `<div class="seat-zone${name === 'Business' ? ' seat-zone-business' : ''}" style="--zone:${visualShare.toFixed(2)}%"><strong>${seats}</strong></div>`;
     }).join('');
     const registrations = aircraft.registrations.map(registration => `<li>${escapeHtml(registration)}</li>`).join('');
-    return `<article class="card aircraft-card" id="${aircraftId(aircraft)}"><div class="aircraft-card-head"><span class="card-tag">${escapeHtml(aircraft.type)}</span><strong class="aircraft-total">${aircraft.total}<small> seats</small></strong></div><div class="seat-bar" aria-label="Approximate cabin class visual; exact seat counts are listed below">${bar}</div><div class="seat-legend">${zones.map(([name, seats]) => `<span>${escapeHtml(name)} <b>${seats}</b></span>`).join('')}</div><div class="aircraft-stats"><div><span>CABIN CREW SEATS</span><strong>${aircraft.cabinCrewSeats}</strong></div><div><span>FLIGHT DECK REST</span>${renderRestStatus(aircraft.flightDeckRest)}</div><div><span>CABIN CREW REST</span>${renderRestStatus(aircraft.cabinCrewRest)}</div></div><details class="registration-list"><summary>Registrations</summary><ul>${registrations}</ul></details></article>`;
+    return `<article class="card aircraft-card" id="${aircraftId(aircraft)}"><div class="aircraft-card-head"><span class="card-tag">${escapeHtml(aircraft.type)}</span><strong class="aircraft-total">${aircraft.total}<small> seats</small></strong></div><div class="seat-bar" aria-label="Approximate cabin class visual; exact seat counts are listed below">${bar}</div><div class="seat-legend">${zones.map(([name, seats]) => `<span>${escapeHtml(name)} <b>${seats}</b></span>`).join('')}</div><div class="aircraft-stats"><div><span>CABIN CREW SEATS</span><strong>${aircraft.cabinCrewSeats}</strong></div><div><span>FLIGHT DECK REST</span>${renderRestStatus(aircraft.flightDeckRest)}</div><div><span>CABIN CREW REST</span>${renderRestStatus(aircraft.cabinCrewRest)}</div></div><details class="registration-list"><summary>Registrations</summary><ul>${registrations}</ul><div class="registration-total"><span>Total in Fleet</span><strong>${aircraft.registrations.length} aircraft</strong></div></details></article>`;
   }).join('');
-  content.innerHTML = heading('FLEET QUICK REFERENCE', sections.aircraft.title, sections.aircraft.desc)
+  content.innerHTML = heading('', sections.aircraft.title, sections.aircraft.desc)
     + `<div class="card-grid aircraft-grid">${cards}</div>`;
 }
 
@@ -897,7 +919,7 @@ function openSection(id) {
   }
   const section = sections[id];
   if (!section) return;
-  content.innerHTML = heading('QUICK REFERENCE', section.title, section.desc)
+  content.innerHTML = heading(id === 'flight' ? '' : 'QUICK REFERENCE', section.title, section.desc)
     + (['flight', 'crew', 'roster'].includes(id) ? '' : caution('This section has not been populated from the two provided workbooks yet.'))
     + renderCards(section.cards || []);
   if (id === 'crew') {

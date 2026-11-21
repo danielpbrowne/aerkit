@@ -7,7 +7,8 @@ window.CSM_DATA = {
     "overnightAllowances": "assets/reference_data/Overnight_Allowances_26.xlsx",
     "roster": "assets/reference_data/Roster_BId_Windows_26_27.xlsx",
     "usefulLinks": "assets/reference_data/Useful_Links_Forms.xlsx",
-    "usefulContacts": "assets/reference_data/Useful_Links_Forms.xlsx#Useful Contact Info"
+    "usefulContacts": "assets/reference_data/Useful_Links_Forms.xlsx#Useful Contact Info",
+    "flightSchedule": "assets/reference_data/Flight_Schedule_Input.xlsx"
   },
   "usefulLinks": [
     {
@@ -6940,6 +6941,251 @@ window.CSM_DATA = {
       "wrPrStart": "29-Nov-27",
       "wrPrEnd": "26-Dec-27",
       "rosterPublication": "14-Oct-27"
+    }
+  ],
+  "flightSchedule": [
+    {
+      "flightNumber": "EI133",
+      "destination": "Boston",
+      "destinationCode": "BOS",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI137",
+      "destination": "Boston",
+      "destinationCode": "BOS",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI135",
+      "destination": "Boston",
+      "destinationCode": "BOS",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI139",
+      "destination": "Boston",
+      "destinationCode": "BOS",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI143",
+      "destination": "Cancun",
+      "destinationCode": "CUN",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI123",
+      "destination": "Chicago",
+      "destinationCode": "ORD",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI125",
+      "destination": "Chicago",
+      "destinationCode": "ORD",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI87",
+      "destination": "Cleveland",
+      "destinationCode": "CLE",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI131",
+      "destination": "Hartford",
+      "destinationCode": "BDL",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI83",
+      "destination": "Indianapolis",
+      "destinationCode": "IND",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI69",
+      "destination": "Los Angeles",
+      "destinationCode": "LAX",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI141",
+      "destination": "Miami",
+      "destinationCode": "MIA",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI95",
+      "destination": "Nashville",
+      "destinationCode": "BNA",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI105",
+      "destination": "New York",
+      "destinationCode": "JFK",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI107",
+      "destination": "New York",
+      "destinationCode": "JFK",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI109",
+      "destination": "New York",
+      "destinationCode": "JFK",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI111",
+      "destination": "New York",
+      "destinationCode": "JFK",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI101",
+      "destination": "Newark",
+      "destinationCode": "EWR",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI121",
+      "destination": "Orlando",
+      "destinationCode": "MCO",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI115",
+      "destination": "Philadelphia",
+      "destinationCode": "PHL",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI81",
+      "destination": "Pittsburgh",
+      "destinationCode": "PIT",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI85",
+      "destination": "Raleigh-Durham",
+      "destinationCode": "RDU",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI61",
+      "destination": "San Francisco",
+      "destinationCode": "SFO",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI53",
+      "destination": "Seattle",
+      "destinationCode": "SEA",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI127",
+      "destination": "Toronto",
+      "destinationCode": "YYZ",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI117",
+      "destination": "Washington",
+      "destinationCode": "IAD",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
+    },
+    {
+      "flightNumber": "EI119",
+      "destination": "Washington",
+      "destinationCode": "IAD",
+      "scheduleLabel": null,
+      "effectiveFrom": null,
+      "effectiveTo": null,
+      "notes": null
     }
   ]
 };
