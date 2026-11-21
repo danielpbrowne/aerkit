@@ -861,7 +861,7 @@ function renderFlightInformation() {
           </div>
         </section>
         <section class="flight-panel flight-weather-panel" aria-labelledby="flight-weather-title">
-          <div class="flight-panel-head flight-weather-head"><div><span class="card-tag">CURRENT OBSERVATIONS</span><h3 id="flight-weather-title">Airport Weather</h3></div><button class="weather-refresh-button" type="button" id="refresh-flight-weather">Refresh</button></div>
+          <div class="flight-panel-head flight-weather-head"><div><span class="card-tag">CURRENT WEATHER</span><h3 id="flight-weather-title">Airport Weather</h3></div><button class="weather-refresh-button" type="button" id="refresh-flight-weather">Refresh</button></div>
           <p class="flight-weather-intro">Latest reported airport conditions, translated into plain English. These are current observations, not a forecast.</p>
           <div class="flight-weather-grid">
             <article class="flight-weather-card"><h4 id="flight-weather-origin-title">Origin</h4><div id="flight-weather-origin" class="flight-weather-details">Select a route to load weather.</div></article>
