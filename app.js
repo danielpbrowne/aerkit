@@ -226,7 +226,7 @@ function renderIfeQuickReference() {
     const cardClass = `card ife-reference-card${card[6] ? ` ${escapeHtml(card[6])}` : ''}`;
     return `<article class="${cardClass}"><span class="card-tag">${escapeHtml(card[0])}</span><h3>${escapeHtml(card[1])}</h3><p>${escapeHtml(card[2])}</p>${steps}${note}</article>`;
   }).join('');
-  content.innerHTML = heading('QUICK REFERENCE', sections.ife.title, sections.ife.desc)
+  content.innerHTML = heading('', sections.ife.title, sections.ife.desc)
     + `<div class="card-grid ife-reference-grid">${cards}</div>`;
 }
 
@@ -919,7 +919,7 @@ function openSection(id) {
   }
   const section = sections[id];
   if (!section) return;
-  content.innerHTML = heading(id === 'flight' ? '' : 'QUICK REFERENCE', section.title, section.desc)
+  content.innerHTML = heading('', section.title, section.desc)
     + (['flight', 'crew', 'roster'].includes(id) ? '' : caution('This section has not been populated from the two provided workbooks yet.'))
     + renderCards(section.cards || []);
   if (id === 'crew') {
