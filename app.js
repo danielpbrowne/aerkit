@@ -860,10 +860,10 @@ function renderFlightInformation() {
         </section>
         <section class="flight-panel flight-weather-panel" aria-labelledby="flight-weather-title">
           <div class="flight-panel-head flight-weather-head"><h3 id="flight-weather-title">Departure &amp; Arrival Forecast</h3><button class="weather-refresh-button" type="button" id="refresh-flight-weather">Refresh</button></div>
-          <p class="flight-weather-intro">Hourly forecast for your planned pushback and arrival times, with conditions, temperature, rain chance, wind and visibility.</p>
+          <p class="flight-weather-intro">Hourly forecast for your planned pushback and arrival times, with conditions, temperature, rain chance, humidity and wind.</p>
           <div class="flight-weather-grid">
-            <article class="flight-weather-card"><h4 id="flight-weather-origin-title">Departure airport</h4><div id="flight-weather-origin" class="flight-weather-details">Select a route and pushback time for a forecast.</div></article>
-            <article class="flight-weather-card"><h4 id="flight-weather-destination-title">Arrival airport</h4><div id="flight-weather-destination" class="flight-weather-details">Enter flight and taxi times for an arrival forecast.</div></article>
+            <article class="flight-weather-card"><div class="flight-weather-card-head"><h4 id="flight-weather-origin-title">Departure airport</h4><div id="flight-weather-origin-condition" class="flight-weather-condition"></div></div><div id="flight-weather-origin" class="flight-weather-details">Select a route and pushback time for a forecast.</div></article>
+            <article class="flight-weather-card"><div class="flight-weather-card-head"><h4 id="flight-weather-destination-title">Arrival airport</h4><div id="flight-weather-destination-condition" class="flight-weather-condition"></div></div><div id="flight-weather-destination" class="flight-weather-details">Enter flight and taxi times for an arrival forecast.</div></article>
           </div>
           <p id="flight-weather-status" class="flight-weather-status" role="status" aria-live="polite">Forecasts are supplied by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>.</p>
         </section>
@@ -1064,10 +1064,14 @@ async function updateFlightWeather({ force = false } = {}) {
   const destinationTitle = panel.querySelector('#flight-weather-destination-title');
   const originOutput = panel.querySelector('#flight-weather-origin');
   const destinationOutput = panel.querySelector('#flight-weather-destination');
+  const originCondition = panel.querySelector('#flight-weather-origin-condition');
+  const destinationCondition = panel.querySelector('#flight-weather-destination-condition');
   const status = panel.querySelector('#flight-weather-status');
 
   originTitle.textContent = origin ? `Departure · ${origin.name}` : 'Departure airport';
   destinationTitle.textContent = destination ? `Arrival · ${destination.name}` : 'Arrival airport';
+  originCondition.textContent = '';
+  destinationCondition.textContent = '';
   status.innerHTML = 'Forecast data from <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>.';
 
   if (!destination) {
@@ -1125,7 +1129,10 @@ async function updateFlightWeather({ force = false } = {}) {
       return;
     }
     const { airport, time, hourly } = result.value;
-    output.innerHTML = renderFlightWeatherForecast(hourly, time, destinationTimeZones[airport.code] || 'UTC');
+    const forecast = renderFlightWeatherForecast(hourly, time, destinationTimeZones[airport.code] || 'UTC');
+    const condition = role === 'origin' ? originCondition : destinationCondition;
+    condition.innerHTML = forecast.condition;
+    output.innerHTML = forecast.details;
   });
   if (failed) status.textContent = 'One or more forecasts could not be loaded. You can try again using Refresh.';
 }
@@ -1136,7 +1143,7 @@ async function fetchHourlyForecast(airport, force = false) {
   const [latitude, longitude] = destinationAirportCoordinates[airport.code];
   const url = new URL('https://api.open-meteo.com/v1/forecast');
   url.search = new URLSearchParams({
-    latitude, longitude, hourly: 'temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,visibility,cloud_cover',
+    latitude, longitude, hourly: 'temperature_2m,apparent_temperature,precipitation_probability,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m',
     forecast_days: '7', timezone: 'UTC', temperature_unit: 'celsius', wind_speed_unit: 'kmh'
   });
   const response = await fetch(url);
@@ -1164,7 +1171,7 @@ function renderFlightWeatherForecast(hourly, targetTime, timeZone) {
     }
   });
   if (selectedIndex < 0 || shortestDifference > 90 * 60_000) {
-    return '<p class="flight-weather-unavailable">A forecast is not available for this time yet.</p>';
+    return { condition: '', details: '<p class="flight-weather-unavailable">A forecast is not available for this time yet.</p>' };
   }
 
   const value = key => hourly[key]?.[selectedIndex];
@@ -1186,6 +1193,8 @@ function renderFlightWeatherForecast(hourly, targetTime, timeZone) {
   const rainChance = numeric('precipitation_probability');
   const precipitation = numeric('precipitation');
   if (Number.isFinite(rainChance)) add('Rain chance', `${Math.round(rainChance)}%${Number.isFinite(precipitation) && precipitation > 0 ? ` · ${precipitation.toFixed(1)} mm expected` : ''}`);
+  const humidity = numeric('relative_humidity_2m');
+  if (Number.isFinite(humidity)) add('Humidity', `${Math.round(humidity)}%`);
   const windSpeed = numeric('wind_speed_10m');
   if (Number.isFinite(windSpeed)) {
     const direction = describeWindDirection(numeric('wind_direction_10m'));
@@ -1193,12 +1202,23 @@ function renderFlightWeatherForecast(hourly, targetTime, timeZone) {
   }
   const gust = numeric('wind_gusts_10m');
   if (Number.isFinite(gust)) add('Gusts', `${Math.round(gust)} km/h`);
-  const visibility = numeric('visibility');
-  if (Number.isFinite(visibility)) add('Visibility', visibility < 1000 ? 'Under 1 km' : `${(visibility / 1000).toFixed(1)} km`);
-  const clouds = numeric('cloud_cover');
-  if (Number.isFinite(clouds)) add('Cloud cover', `${Math.round(clouds)}%`);
+  const pairedLabels = { Temperature: 'Feels like', 'Rain chance': 'Humidity', Wind: 'Gusts' };
+  const detailRows = [];
+  for (let index = 0; index < details.length; index += 1) {
+    const [label, text] = details[index];
+    if (pairedLabels[label] && details[index + 1]?.[0] === pairedLabels[label]) {
+      const [nextLabel, nextText] = details[index + 1];
+      detailRows.push(`<div class="weather-detail-pair"><div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(text)}</dd></div><div><dt>${escapeHtml(nextLabel)}</dt><dd>${escapeHtml(nextText)}</dd></div></div>`);
+      index += 1;
+    } else {
+      detailRows.push(`<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(text)}</dd></div>`);
+    }
+  }
 
-  return `<div class="flight-weather-condition"><span aria-hidden="true">${icon}</span> ${escapeHtml(condition)}</div><p class="weather-forecast-time">Forecast for ${escapeHtml(localTime)} local time</p><dl>${details.map(([label, text]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(text)}</dd></div>`).join('')}</dl>`;
+  return {
+    condition: `<span aria-hidden="true">${icon}</span> ${escapeHtml(condition)}`,
+    details: `<p class="weather-forecast-time">Forecast for ${escapeHtml(localTime)} local time</p><dl>${detailRows.join('')}</dl>`
+  };
 }
 
 function describeWindDirection(value) {
