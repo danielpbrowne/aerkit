@@ -1014,6 +1014,20 @@ function renderFlightInformation() {
       : 'Not entered';
     const pax = ['business', 'premiumEconomy', 'economy', 'infants'].reduce((sum, name) => sum + Math.max(0, Number(values[name]) || 0), 0);
     const flightTime = `${values.flightHours || '0'}h ${values.flightMinutes || '0'}m`;
+    const snapshotWeather = [
+      ['Departure', origin || 'Not selected', 'origin'],
+      ['Arrival', destination, 'destination']
+    ].map(([label, airportName, role]) => {
+      const condition = content.querySelector(`#flight-weather-${role}-condition`).textContent.trim();
+      const output = content.querySelector(`#flight-weather-${role}`);
+      const details = Object.fromEntries([...output.querySelectorAll('dt')].map(term => [term.textContent.trim(), term.nextElementSibling?.textContent.trim() || '']));
+      const temperature = details.Temperature
+        ? `${details.Temperature}${details['Feels like'] ? ` (feels ${details['Feels like']})` : ''}`
+        : '';
+      const brief = [temperature, details['Rain chance'] ? `Rain ${details['Rain chance']}` : '', details.Wind ? `Wind ${details.Wind}` : '', details.Gusts ? `gusts ${details.Gusts}` : '']
+        .filter(Boolean).join(' · ');
+      return { label: `${label} · ${airportName}`, condition, brief };
+    });
     const rows = [
       ['Route', `${origin ? `${origin} → ` : ''}${destination}`],
       ['Pushback', pushback],
@@ -1023,6 +1037,7 @@ function renderFlightInformation() {
       ['Total Passengers', String(pax)],
       ['Dublin arrival', content.querySelector('#estimated-arrival-dublin').textContent],
       ['Local arrival', content.querySelector('#estimated-arrival-destination').textContent],
+      ['Route weather', snapshotWeather],
       ['Flight notes', values.flightInformation || 'None']
     ];
     content.querySelector('#flight-snapshot-content').innerHTML = rows.map(([label, value]) => {
@@ -1030,6 +1045,10 @@ function renderFlightInformation() {
       if (label === 'Passengers') {
         const passengers = value.map(([name, count]) => `<div><span>${escapeHtml(name)}</span><strong>${escapeHtml(count)}</strong></div>`).join('');
         return `<section class="snapshot-row snapshot-passenger-row"><span>${escapeHtml(label)}</span><div class="snapshot-passenger-list">${passengers}</div></section>`;
+      }
+      if (label === 'Route weather') {
+        const forecasts = value.map(({ label: airportLabel, condition, brief }) => `<div><strong>${escapeHtml(airportLabel)}${condition ? ` · ${escapeHtml(condition)}` : ''}</strong><span>${escapeHtml(brief || 'Forecast not available')}</span></div>`).join('');
+        return `<section class="snapshot-row snapshot-weather-row"><span>${escapeHtml(label)}</span><div class="snapshot-weather-list">${forecasts}</div></section>`;
       }
       const formattedValue = escapeHtml(value);
       return `<section class="snapshot-row${rowClass}"><span>${escapeHtml(label)}</span><strong>${formattedValue}</strong></section>`;
