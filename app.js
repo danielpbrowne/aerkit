@@ -817,20 +817,18 @@ function renderAircraft() {
 }
 
 function renderFlightInformation() {
-  const destinationOptions = [{ name: 'Dublin', code: 'DUB' }, ...data.destinations].sort((a, b) => a.name.localeCompare(b.name))
-    .map(destination => `<option value="${escapeHtml(destination.code)}">${escapeHtml(destination.name)} (${escapeHtml(destination.code)})</option>`).join('');
-  const originOptions = [...data.destinations].sort((a, b) => a.name.localeCompare(b.name))
-    .map(origin => `<option value="${escapeHtml(origin.code)}">${escapeHtml(origin.name)} (${escapeHtml(origin.code)})</option>`).join('');
+  const routeAirportOptions = [{ name: 'Dublin', code: 'DUB' }, ...data.destinations].sort((a, b) => a.name.localeCompare(b.name))
+    .map(airport => `<option value="${escapeHtml(airport.code)}">${escapeHtml(airport.code)}</option>`).join('');
   content.innerHTML = heading('', sections.flightInfo.title, sections.flightInfo.desc)
     + `<form class="flight-form" id="flight-information-form" autocomplete="off">
-      <section class="flight-panel flight-route-panel"><div class="flight-panel-head"><h3>Flight Route</h3></div>
+      <section class="flight-panel flight-route-panel"><div class="flight-panel-head"><h3>Where are you going?</h3></div>
         <div class="flight-fields flight-route-fields">
-          <label class="flight-field"><span>Destination</span><select name="destination"><option value="">Select destination</option>${destinationOptions}</select></label>
-          <label class="flight-field" id="origin-airport-wrap" hidden><span>Origin airport</span><select name="originAirport" id="origin-airport"><option value="">Select origin airport</option>${originOptions}</select></label>
+          <label class="flight-field"><span>Departure</span><select name="originAirport" id="origin-airport"><option value="">Select</option>${routeAirportOptions}</select></label>
+          <label class="flight-field"><span>Arrival</span><select name="destination"><option value="">Select</option>${routeAirportOptions}</select></label>
         </div>
       </section>
       <div class="flight-form-grid">
-        <section class="flight-panel"><div class="flight-panel-head"><h3>Passenger Figures</h3></div>
+        <section class="flight-panel"><div class="flight-panel-head"><h3>Passenger Numbers</h3></div>
           <div class="passenger-counts">
             <label class="flight-field"><span>Business Class</span><input name="business" type="number" min="0" max="30" step="1" inputmode="numeric" placeholder="0"></label>
             <label class="flight-field"><span>Premium Economy</span><input name="premiumEconomy" type="number" min="0" max="28" step="1" inputmode="numeric" placeholder="0"></label>
@@ -842,9 +840,9 @@ function renderFlightInformation() {
           </div>
           <div class="passenger-total"><span>TOTAL PAX · INCLUDES INFANTS</span><strong id="passenger-total">0</strong></div>
         </section>
-        <section class="flight-panel"><div class="flight-panel-head"><h3>Flight Timings</h3></div>
+        <section class="flight-panel"><div class="flight-panel-head"><h3>Flight Times</h3></div>
           <div class="flight-fields">
-            <div class="flight-field pushback-time-field"><label for="pushback-time">Pushback time</label><input id="pushback-time" name="pushback" type="datetime-local" aria-describedby="pushback-time-zone"><small id="pushback-time-zone" role="status" aria-live="polite">Time zone used: Dublin (Europe/Dublin)</small><button class="current-time-button" type="button" id="use-current-pushback-time">Use current time</button></div>
+            <div class="flight-pushback-row"><div class="flight-field pushback-time-field"><label for="pushback-time">Pushback time</label><input id="pushback-time" name="pushback" type="datetime-local" aria-describedby="pushback-time-zone"><small id="pushback-time-zone" role="status" aria-live="polite">Select a departure airport to set the time zone.</small></div><button class="current-time-button" type="button" id="use-current-pushback-time">Use Current Time</button></div>
             <div class="flight-duration-pair">
               <label class="flight-field taxi-minutes-field"><span>Taxi (mins)</span><input name="taxiMinutes" type="number" min="1" step="1" inputmode="numeric" placeholder="0"></label>
               <fieldset class="flight-field duration-field"><legend>Flight Time</legend><div><label><input name="flightHours" type="number" min="0" max="30" inputmode="numeric" placeholder="0"><small>hours</small></label><b>:</b><label><input name="flightMinutes" type="number" min="0" max="59" inputmode="numeric" placeholder="00"><small>minutes</small></label></div></fieldset>
@@ -852,13 +850,13 @@ function renderFlightInformation() {
           </div>
           <div class="arrival-summary"><span>ESTIMATED TIME OF ARRIVAL</span><div class="arrival-time"><small>DUBLIN LOCAL TIME</small><strong id="estimated-arrival-dublin">Enter the required times</strong></div><div class="arrival-time"><small id="destination-arrival-label">DESTINATION LOCAL TIME</small><strong id="estimated-arrival-destination">Select destination</strong></div></div>
         </section>
-        <section class="flight-panel notes-panel"><div class="flight-panel-head"><span class="card-tag">FLIGHT NOTES</span></div>
+        <section class="flight-panel notes-panel">
           <div class="flight-fields notes-fields">
             <label class="flight-field"><span>Flight notes</span><textarea name="flightInformation" rows="3" placeholder="Add operational notes such as weather, turbulence, delays or other items to brief the crew."></textarea></label>
           </div>
         </section>
         <section class="flight-panel flight-weather-panel" aria-labelledby="flight-weather-title">
-          <div class="flight-panel-head flight-weather-head"><div><span class="card-tag">ROUTE WEATHER</span><h3 id="flight-weather-title">Departure &amp; Arrival Forecast</h3></div><button class="weather-refresh-button" type="button" id="refresh-flight-weather">Refresh</button></div>
+          <div class="flight-panel-head flight-weather-head"><h3 id="flight-weather-title">Departure &amp; Arrival Forecast</h3><button class="weather-refresh-button" type="button" id="refresh-flight-weather">Refresh</button></div>
           <p class="flight-weather-intro">Hourly forecast for your planned pushback and arrival times, with conditions, temperature, rain chance, wind and visibility.</p>
           <div class="flight-weather-grid">
             <article class="flight-weather-card"><h4 id="flight-weather-origin-title">Departure airport</h4><div id="flight-weather-origin" class="flight-weather-details">Select a route and pushback time for a forecast.</div></article>
@@ -867,7 +865,7 @@ function renderFlightInformation() {
           <p id="flight-weather-status" class="flight-weather-status" role="status" aria-live="polite">Forecasts are supplied by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>.</p>
         </section>
       </div>
-      <div class="flight-form-footer"><small id="flight-save-status" role="status">Entries stay in this page only and are cleared when you leave. PRMs are recorded separately and are not included in passenger total.</small><div class="flight-footer-actions"><button class="clear-flight-button" type="button" id="show-flight-snapshot">Flight Snapshot</button><button class="clear-flight-button" type="button" id="clear-flight-information">Clear Flight Information</button></div></div>
+      <div class="flight-form-footer"><div class="flight-footer-actions"><button class="clear-flight-button" type="button" id="show-flight-snapshot">Flight Snapshot</button><button class="clear-flight-button" type="button" id="clear-flight-information">Clear Flight Information</button></div></div>
     </form>
     <dialog class="flight-snapshot-dialog" id="flight-snapshot-dialog" aria-labelledby="flight-snapshot-title">
       <article class="flight-snapshot-card">
@@ -878,7 +876,6 @@ function renderFlightInformation() {
     </dialog>`;
 
   const form = content.querySelector('#flight-information-form');
-  const saveStatus = content.querySelector('#flight-save-status');
   const cappedPassengerFields = { business: 30, premiumEconomy: 28 };
   const capPassengerCounts = () => {
     Object.entries(cappedPassengerFields).forEach(([name, maximum]) => {
@@ -906,23 +903,15 @@ function renderFlightInformation() {
     const hasTaxiTime = form.elements.taxiMinutes.value !== '';
     const estimatedDublin = content.querySelector('#estimated-arrival-dublin');
     const estimatedDestination = content.querySelector('#estimated-arrival-destination');
-    const originWrap = content.querySelector('#origin-airport-wrap');
     const originAirport = form.elements.originAirport;
     const pushbackTimeZone = content.querySelector('#pushback-time-zone');
-    const isDublinDestination = form.elements.destination.value === 'DUB';
-    originWrap.hidden = !isDublinDestination;
-    originAirport.required = isDublinDestination;
-    if (!isDublinDestination) originAirport.value = '';
-    const destination = data.destinations.find(item => item.code === form.elements.destination.value)
-      || (form.elements.destination.value === 'DUB' ? { name: 'Dublin', code: 'DUB' } : null);
-    const origin = data.destinations.find(item => item.code === originAirport.value);
-    const pushbackZone = isDublinDestination ? destinationTimeZones[originAirport.value] : 'Europe/Dublin';
-    const pushbackZoneLabel = isDublinDestination
-      ? (origin && pushbackZone ? `${origin.name} (${pushbackZone})` : '')
-      : `Dublin (${pushbackZone})`;
+    const destination = getFlightAirport(form.elements.destination.value);
+    const origin = getFlightAirport(originAirport.value);
+    const pushbackZone = destinationTimeZones[originAirport.value];
+    const pushbackZoneLabel = origin && pushbackZone ? `${origin.name} (${pushbackZone})` : '';
     pushbackTimeZone.textContent = pushbackZoneLabel
       ? `Time zone used: ${pushbackZoneLabel}`
-      : 'Select an origin airport to set the pushback time zone.';
+      : 'Select a departure airport to set the pushback time zone.';
     content.querySelector('#use-current-pushback-time').disabled = !pushbackZone;
     content.querySelector('#destination-arrival-label').textContent = destination
       ? `ESTIMATED ARRIVAL · ${destination.name.toUpperCase()} LOCAL TIME`
@@ -935,8 +924,8 @@ function renderFlightInformation() {
     }
 
     if (!pushbackZone) {
-      estimatedDublin.textContent = 'Select an origin airport to set the pushback time zone';
-      estimatedDestination.textContent = 'Select an origin airport to set the pushback time zone';
+      estimatedDublin.textContent = 'Select a departure airport to set the pushback time zone';
+      estimatedDestination.textContent = 'Select a departure airport to set the pushback time zone';
       return;
     }
 
@@ -979,9 +968,7 @@ function renderFlightInformation() {
   form.addEventListener('change', scheduleWeatherUpdate);
   content.querySelector('#refresh-flight-weather').addEventListener('click', () => updateFlightWeather({ force: true }));
   content.querySelector('#use-current-pushback-time').addEventListener('click', () => {
-    const selectedZone = form.elements.destination.value === 'DUB'
-      ? destinationTimeZones[form.elements.originAirport.value]
-      : 'Europe/Dublin';
+    const selectedZone = destinationTimeZones[form.elements.originAirport.value];
     if (!selectedZone) return;
     const now = new Date();
     const pad = value => String(value).padStart(2, '0');
@@ -996,16 +983,14 @@ function renderFlightInformation() {
 
   content.querySelector('#clear-flight-information').addEventListener('click', () => {
     form.reset();
-    saveStatus.textContent = 'Flight information cleared from this page.';
     updateFlightSummary();
     updateFlightWeather();
   });
   content.querySelector('#show-flight-snapshot').addEventListener('click', () => {
     const values = Object.fromEntries(new FormData(form).entries());
-    const destination = data.destinations.find(item => item.code === values.destination)?.name
-      || (values.destination === 'DUB' ? 'Dublin' : 'Not selected');
-    const origin = data.destinations.find(item => item.code === values.originAirport)?.name;
-    const snapshotPushbackZone = values.destination === 'DUB' ? destinationTimeZones[values.originAirport] : 'Europe/Dublin';
+    const destination = getFlightAirport(values.destination)?.name || 'Not selected';
+    const origin = getFlightAirport(values.originAirport)?.name;
+    const snapshotPushbackZone = destinationTimeZones[values.originAirport];
     const pushback = values.pushback && snapshotPushbackZone
       ? formatFlightTime(wallTimeToDate(values.pushback, snapshotPushbackZone), snapshotPushbackZone)
       : 'Not entered';
@@ -1045,7 +1030,7 @@ function formatFlightTime(date, timeZone) {
     hourCycle: 'h23', timeZoneName: 'short'
   }).formatToParts(date);
   const part = type => parts.find(item => item.type === type)?.value || '';
-  return `${part('hour')}:${part('minute')} ${part('timeZoneName')} | ${part('day')}-${part('month')}`;
+  return `${part('hour')}:${part('minute')} ${part('timeZoneName')} | ${part('day')} ${part('month')}`;
 }
 
 async function updateFlightWeather({ force = false } = {}) {
@@ -1054,8 +1039,7 @@ async function updateFlightWeather({ force = false } = {}) {
   if (!form || !panel) return;
   const requestId = ++flightWeatherRequestId;
   const destinationCode = form.elements.destination.value;
-  const isDublinDestination = destinationCode === 'DUB';
-  const originCode = isDublinDestination ? form.elements.originAirport.value : 'DUB';
+  const originCode = form.elements.originAirport.value;
   const origin = getFlightAirport(originCode);
   const destination = getFlightAirport(destinationCode);
   const originTitle = panel.querySelector('#flight-weather-origin-title');
@@ -1080,7 +1064,7 @@ async function updateFlightWeather({ force = false } = {}) {
     return;
   }
 
-  const pushbackZone = isDublinDestination ? destinationTimeZones[originCode] : 'Europe/Dublin';
+  const pushbackZone = destinationTimeZones[originCode];
   const pushback = form.elements.pushback.value && pushbackZone
     ? wallTimeToDate(form.elements.pushback.value, pushbackZone)
     : new Date(NaN);
