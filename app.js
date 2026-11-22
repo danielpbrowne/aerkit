@@ -817,14 +817,17 @@ function renderAircraft() {
 }
 
 function renderFlightInformation() {
-  const routeAirportOptions = [{ name: 'Dublin', code: 'DUB' }, ...data.destinations].sort((a, b) => a.name.localeCompare(b.name))
-    .map(airport => `<option value="${escapeHtml(airport.code)}">${escapeHtml(airport.code)}</option>`).join('');
+  const routeAirports = [{ name: 'Dublin', code: 'DUB' }, ...data.destinations].sort((a, b) => a.name.localeCompare(b.name));
+  const departureAirportOptions = routeAirports
+    .map(airport => `<option value="${escapeHtml(airport.code)}">${escapeHtml(airport.name)} (${escapeHtml(airport.code)})</option>`).join('');
+  const arrivalAirportOptions = routeAirports
+    .map(airport => `<option value="${escapeHtml(airport.code)}">${escapeHtml(airport.name)} (${escapeHtml(airport.code)})</option>`).join('');
   content.innerHTML = heading('', sections.flightInfo.title, sections.flightInfo.desc)
     + `<form class="flight-form" id="flight-information-form" autocomplete="off">
       <section class="flight-panel flight-route-panel"><div class="flight-panel-head"><h3>Where are you going?</h3></div>
         <div class="flight-fields flight-route-fields">
-          <label class="flight-field"><span>Departure</span><select name="originAirport" id="origin-airport"><option value="">Select</option>${routeAirportOptions}</select></label>
-          <label class="flight-field"><span>Arrival</span><select name="destination"><option value="">Select</option>${routeAirportOptions}</select></label>
+          <label class="flight-field"><span>Departure</span><select name="originAirport" id="origin-airport"><option value="">Select</option>${departureAirportOptions}</select></label>
+          <label class="flight-field"><span>Arrival</span><select name="destination"><option value="">Select</option>${arrivalAirportOptions}</select></label>
         </div>
       </section>
       <div class="flight-form-grid">
@@ -876,6 +879,19 @@ function renderFlightInformation() {
     </dialog>`;
 
   const form = content.querySelector('#flight-information-form');
+  const updateArrivalOptions = () => {
+    const originCode = form.elements.originAirport.value;
+    const selectedArrival = form.elements.destination.value;
+    const allowedArrivals = originCode === 'DUB'
+      ? data.destinations
+      : originCode
+        ? [{ name: 'Dublin', code: 'DUB' }]
+        : routeAirports;
+    form.elements.destination.innerHTML = '<option value="">Select</option>' + allowedArrivals
+      .map(airport => `<option value="${escapeHtml(airport.code)}">${escapeHtml(airport.name)} (${escapeHtml(airport.code)})</option>`).join('');
+    form.elements.destination.value = allowedArrivals.some(airport => airport.code === selectedArrival) ? selectedArrival : '';
+  };
+  updateArrivalOptions();
   const cappedPassengerFields = { business: 30, premiumEconomy: 28 };
   const capPassengerCounts = () => {
     Object.entries(cappedPassengerFields).forEach(([name, maximum]) => {
@@ -952,7 +968,8 @@ function renderFlightInformation() {
       : 'Select destination';
   };
 
-  const handleFlightInput = () => {
+  const handleFlightInput = event => {
+    if (event.target.name === 'originAirport') updateArrivalOptions();
     capPassengerCounts();
     updateFlightSummary();
   };
@@ -983,6 +1000,7 @@ function renderFlightInformation() {
 
   content.querySelector('#clear-flight-information').addEventListener('click', () => {
     form.reset();
+    updateArrivalOptions();
     updateFlightSummary();
     updateFlightWeather();
   });
