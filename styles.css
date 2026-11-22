@@ -253,6 +253,21 @@ html[data-theme="dark"] .passenger-total,html[data-theme="dark"] .snapshot-total
 html[data-theme="dark"] .passenger-total>span,html[data-theme="dark"] .snapshot-total-row>span{color:#d9e2df}
 html[data-theme="dark"] .passenger-total>strong,html[data-theme="dark"] .snapshot-total-row>strong{color:#fff}
 html[data-theme="dark"] .destination:hover,html[data-theme="dark"] .useful-resource-link:hover{background:#273940}
+html[data-theme="dark"] .protocol-steps>section{border-color:var(--line);background:#26353a;color:var(--ink)}
+html[data-theme="dark"] .protocol-steps h4{color:var(--ink)}
+html[data-theme="dark"] .protocol-steps p{color:var(--muted)}
+html[data-theme="dark"] .protocol-credit-table tbody th{border-color:var(--line);background:#26353a;color:#f2f5f4}
+html[data-theme="dark"] .protocol-credit-table tbody td{border-color:var(--line);background:var(--paper);color:var(--ink)}
+html[data-theme="dark"] .amenity-item{border-color:var(--line);background:#26353a}
+html[data-theme="dark"] .amenity-item>strong{color:var(--ink)}
+html[data-theme="dark"] .contact-card,html[data-theme="dark"] .contact-extra{border-color:var(--line);background:#26353a;color:var(--ink)}
+html[data-theme="dark"] .contact-action{border-color:var(--line);background:#17272e;color:var(--ink)}
+html[data-theme="dark"] .contact-action span{color:#aebdc0}
+html[data-theme="dark"] .contact-action strong{color:var(--ink)}
+html[data-theme="dark"] .contact-action:hover{border-color:#a98727;background:#31454b}
+html[data-theme="dark"] .contact-action-unverified{border-color:#8b753c;background:#403820}
+html[data-theme="dark"] .map-action{border-color:var(--line);background:#26353a;color:#ead28a}
+html[data-theme="dark"] .map-action:hover{border-color:#a98727;background:#31454b}
 html[data-theme="dark"] footer{border-color:var(--line)}
 
 .ife-reference-grid{grid-template-columns:repeat(2,minmax(0,1fr))}

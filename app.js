@@ -1,11 +1,11 @@
 const data = window.CSM_DATA;
 const sections = {
   essentials: { title: 'Quick Access', desc: 'Quick access to the most frequently visited tools.' },
-  destinations: { title: 'Destination Guide', desc: 'Select your destination from the list below to find Airport, Hotel & Transport Information' },
-  aircraft: { title: 'Aircraft Types', desc: 'Aircraft Seating Capacity and Registrations' },
-  flightInfo: { title: 'Flight Information', desc: '' },
+  destinations: { title: 'Where We Fly', desc: 'Select your destination from the list below to find Airport, Hotel & Transport Information' },
+  aircraft: { title: 'Aircraft Type', desc: 'Aircraft Seating Capacity and Registrations' },
+  flightInfo: { title: 'Flight Plan', desc: '' },
   flight: {
-    title: 'Flight & Duty', desc: 'Flight & Duty Information',
+    title: 'Flight & Duty References', desc: '',
     cards: [
       ['BASIC', 'Basic Maximum Daily FDP', 'Basic Maximum FDP is calculated from each crew member’s report time. It is then reduced according to the number of sectors operated as per the table.'],
       ['ACCLIMATISATION', 'Acclimatisation Checker', 'Check the acclimatisation state for a crew member leaving Dublin.'],
@@ -398,14 +398,13 @@ function renderBasicFdpCard(card) {
   const reportOptions = basicFdpRows.map(([reportTime], index) => `<option value="${index}">${reportTime}</option>`).join('');
   return `<article class="card fdp-card"><span class="card-tag">${escapeHtml(card[0])}</span><h3>${escapeHtml(card[1])}</h3>
     <p>Pick your report-time band, then the number of sectors to be operated. This will calculate your <strong>basic</strong> maximum FDP allowable under EASA FTL's.</p>
-    <p class="fdp-acclim-prompt">Check Acclimatisation state below if you are starting your Duty away from your Home Base after 48hrs from your starting report time.</p>
     <form class="acclim-checker" id="basic-fdp-checker">
       <label class="acclim-field"><span>Report time (reference time)</span><select name="reportTime" required><option value="">Select report-time band</option>${reportOptions}</select></label>
       <label class="acclim-field"><span>Sectors operated</span><select name="sectors" required><option value="">Select sectors</option><option value="1">1–2 sectors</option><option value="2">3 sectors</option><option value="3">4 sectors</option></select></label>
       <div class="acclim-actions"><button class="acclim-calculate" type="submit">Check maximum FDP</button><button class="acclim-reset" type="reset">Reset</button></div>
       <div class="acclim-result fdp-basic-result" id="basic-fdp-result" role="status" aria-live="polite" hidden></div>
     </form>
-    <p class="acclim-note">This is a basic FDP estimate. Ensure all collective agreements are also followed and applied where necessary.</p>
+    <p class="acclim-note">This is a basic FDP estimate. There are other factors which can affect your Maximum FDP, including; Acclimatisation State, Extension due to In-Flight Rest etc.<br>Ensure all collective agreements are followed and applied where necessary</p>
   </article>`;
 }
 
@@ -824,7 +823,7 @@ function renderFlightInformation() {
     .map(airport => `<option value="${escapeHtml(airport.code)}">${escapeHtml(airport.name)} (${escapeHtml(airport.code)})</option>`).join('');
   content.innerHTML = heading('', sections.flightInfo.title, sections.flightInfo.desc)
     + `<form class="flight-form" id="flight-information-form" autocomplete="off">
-      <section class="flight-panel flight-route-panel"><div class="flight-panel-head"><h3>Where are you going?</h3></div>
+      <section class="flight-panel flight-route-panel"><div class="flight-panel-head"><h3>Where to today?</h3></div>
         <div class="flight-fields flight-route-fields">
           <label class="flight-field"><span>Departure</span><select name="originAirport" id="origin-airport"><option value="">Select</option>${departureAirportOptions}</select></label>
           <label class="flight-field"><span>Arrival</span><select name="destination"><option value="">Select</option>${arrivalAirportOptions}</select></label>
@@ -859,8 +858,8 @@ function renderFlightInformation() {
           </div>
         </section>
         <section class="flight-panel flight-weather-panel" aria-labelledby="flight-weather-title">
-          <div class="flight-panel-head flight-weather-head"><h3 id="flight-weather-title">Departure &amp; Arrival Forecast</h3><button class="weather-refresh-button" type="button" id="refresh-flight-weather">Refresh</button></div>
-          <p class="flight-weather-intro">Hourly forecast for your planned pushback and arrival times, with conditions, temperature, rain chance, humidity and wind.</p>
+          <div class="flight-panel-head flight-weather-head"><h3 id="flight-weather-title">How&#39;s The Weather?</h3><button class="weather-refresh-button" type="button" id="refresh-flight-weather">Refresh</button></div>
+          <p class="flight-weather-intro">Forecast for your planned departure and arrival time.</p>
           <div class="flight-weather-grid">
             <article class="flight-weather-card"><div class="flight-weather-card-head"><h4 id="flight-weather-origin-title">Departure airport</h4><div id="flight-weather-origin-condition" class="flight-weather-condition"></div></div><div id="flight-weather-origin" class="flight-weather-details">Select a route and pushback time for a forecast.</div></article>
             <article class="flight-weather-card"><div class="flight-weather-card-head"><h4 id="flight-weather-destination-title">Arrival airport</h4><div id="flight-weather-destination-condition" class="flight-weather-condition"></div></div><div id="flight-weather-destination" class="flight-weather-details">Enter flight and taxi times for an arrival forecast.</div></article>
@@ -1067,7 +1066,7 @@ function formatFlightTime(date, timeZone) {
     hourCycle: 'h23', timeZoneName: 'short'
   }).formatToParts(date);
   const part = type => parts.find(item => item.type === type)?.value || '';
-  return `${part('hour')}:${part('minute')} ${part('timeZoneName')} | ${part('day')} ${part('month')}`;
+  return `${part('hour')}:${part('minute')} (${part('timeZoneName')}) | ${part('day')} ${part('month')}`;
 }
 
 async function updateFlightWeather({ force = false } = {}) {
