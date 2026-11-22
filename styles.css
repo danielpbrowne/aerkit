@@ -252,12 +252,20 @@ html[data-theme="dark"] .search-result-heading,html[data-theme="dark"] .ninth-es
 html[data-theme="dark"] .passenger-total,html[data-theme="dark"] .snapshot-total-row{border-color:#597078;background:#31454b;color:#f7f7f2}
 html[data-theme="dark"] .passenger-total>span,html[data-theme="dark"] .snapshot-total-row>span{color:#d9e2df}
 html[data-theme="dark"] .passenger-total>strong,html[data-theme="dark"] .snapshot-total-row>strong{color:#fff}
+html[data-theme="dark"] .commission-result{border-color:#52666b;background:#263a43}
+html[data-theme="dark"] .commission-result span{color:#b9ceca}
+html[data-theme="dark"] .commission-result strong{color:#f2f5f4}
+html[data-theme="dark"] .commission-result small{color:#c2cecf}
 html[data-theme="dark"] .destination:hover,html[data-theme="dark"] .useful-resource-link:hover{background:#273940}
 html[data-theme="dark"] .protocol-steps>section{border-color:var(--line);background:#26353a;color:var(--ink)}
 html[data-theme="dark"] .protocol-steps h4{color:var(--ink)}
 html[data-theme="dark"] .protocol-steps p{color:var(--muted)}
 html[data-theme="dark"] .protocol-credit-table tbody th{border-color:var(--line);background:#26353a;color:#f2f5f4}
 html[data-theme="dark"] .protocol-credit-table tbody td{border-color:var(--line);background:var(--paper);color:var(--ink)}
+html[data-theme="dark"] .acclim-result{border-color:#52666b;background:#26353a;color:var(--ink)}
+html[data-theme="dark"] .acclim-result[data-state="B"],html[data-theme="dark"] .acclim-result[data-state="D"]{border-color:#4e7e59;background:#20392e;color:#e7f3e7}
+html[data-theme="dark"] .acclim-result[data-state="X"]{border-color:#9d7526;background:#403820;color:#fff0c2}
+html[data-theme="dark"] .acclim-cap-list li{border-color:#9d7526;background:#302b1e;color:#f7e9be}
 html[data-theme="dark"] .amenity-item{border-color:var(--line);background:#26353a}
 html[data-theme="dark"] .amenity-item>strong{color:var(--ink)}
 html[data-theme="dark"] .contact-card,html[data-theme="dark"] .contact-extra{border-color:var(--line);background:#26353a;color:var(--ink)}
