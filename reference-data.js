@@ -1,5 +1,5 @@
 window.CSM_DATA = {
-  "informationLastUpdated": "2026-11-17",
+  "informationLastUpdated": "2026-11-25",
   "sources": {
     "destinations": "assets/reference_data/CSM_Destination_Source_Register_Master.xlsx",
     "aircraft": "assets/reference_data/Aircraft_Fleet_Details.xlsx",
@@ -5003,11 +5003,11 @@ window.CSM_DATA = {
       "code": "SFO",
       "category": "Hotel",
       "field": "Hotel Name",
-      "value": "Westin St. Francis - Union Square",
+      "value": "The Clift Royal Sonesta",
       "format": "Name",
       "source": "AIMS / eCrew",
       "sourceDate": "2026-11-01",
-      "checkedDate": "2026-11-07",
+      "checkedDate": "2026-11-25",
       "status": "Verified"
     },
     {
@@ -5015,11 +5015,11 @@ window.CSM_DATA = {
       "code": "SFO",
       "category": "Hotel",
       "field": "Hotel Address",
-      "value": "335 Powell St., San Francisco, CA 94102",
+      "value": "495 Geary St., San Francisco, CA 94102",
       "format": "Hotel Address",
       "source": "AIMS / eCrew",
       "sourceDate": "2026-11-01",
-      "checkedDate": "2026-11-07",
+      "checkedDate": "2026-11-25",
       "status": "Verified"
     },
     {
@@ -5027,11 +5027,11 @@ window.CSM_DATA = {
       "code": "SFO",
       "category": "Hotel",
       "field": "Hotel Telephone",
-      "value": "+1 415 397 7000",
+      "value": "+1-415-775-4700",
       "format": "International format",
       "source": "AIMS / eCrew",
       "sourceDate": "2026-11-01",
-      "checkedDate": "2026-11-07",
+      "checkedDate": "2026-11-25",
       "status": "Verified"
     },
     {
@@ -5039,11 +5039,11 @@ window.CSM_DATA = {
       "code": "SFO",
       "category": "Hotel",
       "field": "Hotel Email",
-      "value": "Stfra@westin.com",
+      "value": "TheCliftAirline@sonesta.com",
       "format": "Email Address",
       "source": "AIMS / eCrew",
       "sourceDate": "2026-11-01",
-      "checkedDate": "2026-11-07",
+      "checkedDate": "2026-11-25",
       "status": "Verified"
     },
     {
@@ -5051,12 +5051,12 @@ window.CSM_DATA = {
       "code": "SFO",
       "category": "Hotel Amenities",
       "field": "Accepts Packages",
-      "value": "Yes (Fee Payable)",
+      "value": "No",
       "format": "Yes / no / details",
       "source": "Awaiting Update",
       "sourceDate": "2026-11-01",
       "checkedDate": "2026-11-07",
-      "status": "Verified"
+      "status": "Awaiting Update"
     },
     {
       "destination": "San Francisco",
@@ -5068,19 +5068,19 @@ window.CSM_DATA = {
       "source": "Confirmed with Hotel",
       "sourceDate": "2026-11-01",
       "checkedDate": "2026-11-07",
-      "status": "Verified"
+      "status": "Awaiting Update"
     },
     {
       "destination": "San Francisco",
       "code": "SFO",
       "category": "Hotel Amenities",
       "field": "Food Discount",
-      "value": "Food Only",
+      "value": "None",
       "format": "Yes / no / details",
       "source": "Confirmed with Hotel",
       "sourceDate": "2026-11-01",
       "checkedDate": "2026-11-07",
-      "status": "Verified"
+      "status": "Awaiting Update"
     },
     {
       "destination": "San Francisco",

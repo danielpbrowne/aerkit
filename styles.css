@@ -262,6 +262,16 @@ html[data-theme="dark"] .protocol-credit-table tbody th{border-color:var(--line)
 html[data-theme="dark"] .protocol-credit-table tbody td{border-color:var(--line);background:var(--paper);color:var(--ink)}
 html[data-theme="dark"] .acclim-result{border-color:#52666b;background:#26353a;color:var(--ink)}
 html[data-theme="dark"] .acclim-result[data-state="B"],html[data-theme="dark"] .acclim-result[data-state="D"]{border-color:#4e7e59;background:#20392e;color:#e7f3e7}
+/* Refinements from the responsive layout review. */
+.flight-notes-field{grid-column:1/-1}
+.protocol-step-number{display:inline-grid;width:23px;height:23px;place-items:center;margin-right:8px;border-radius:50%;background:var(--navy);color:#f7f7f2;font:700 12px/1 ui-monospace,SFMono-Regular,monospace;vertical-align:1px}
+.commission-card{grid-column:auto}
+.commission-calculator{grid-template-columns:repeat(2,minmax(0,1fr))}
+.commission-result{grid-column:1/-1}
+@media(min-width:761px){.crew-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.crew-card-grid .overnight-allowance-card{grid-column:1/-1}}
+html[data-theme="dark"] .protocol-step-number{background:#456575;color:#fff}
+html[data-theme="dark"] .amenity-status.is-no,html[data-theme="dark"] .aircraft-rest-status.is-no{background:#602c2c;color:#ffb4ad}
+html[data-theme="dark"] .amenity-status.is-yes,html[data-theme="dark"] .aircraft-rest-status.is-yes{background:#224b32;color:#b7f7c3}
 html[data-theme="dark"] .acclim-result[data-state="X"]{border-color:#9d7526;background:#403820;color:#fff0c2}
 html[data-theme="dark"] .acclim-cap-list li{border-color:#9d7526;background:#302b1e;color:#f7e9be}
 html[data-theme="dark"] .amenity-item{border-color:var(--line);background:#26353a}
