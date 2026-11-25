@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aerkit-reference-v1-20261122-r9';
+const CACHE_NAME = 'aerkit-reference-v1-20261125-r10';
 const SHELL = [
   './', './index.html', './styles.css', './app.js', './reference-data.js',
   './manifest.webmanifest', './icon.svg', './assets/AerKit.png',
