@@ -811,11 +811,12 @@ function renderAircraft() {
 }
 
 function renderFlightInformation() {
-  const routeAirports = [{ name: 'Dublin', code: 'DUB' }, ...data.destinations].sort((a, b) => a.name.localeCompare(b.name));
-  const departureAirportOptions = routeAirports
-    .map(airport => `<option value="${escapeHtml(airport.code)}">${escapeHtml(airport.name)} (${escapeHtml(airport.code)})</option>`).join('');
+  const routeAirports = [{ name: 'Dublin', code: 'DUB' }, ...data.destinations.filter(airport => airport.code !== 'DUB')].sort((a, b) => a.name.localeCompare(b.name));
+  const renderAirportOption = airport => `<option value="${escapeHtml(airport.code)}">${escapeHtml(airport.name)} (${escapeHtml(airport.code)})</option>`;
+  const dublinOption = routeAirports.find(airport => airport.code === 'DUB');
+  const departureAirportOptions = `${renderAirportOption(dublinOption)}<hr>${routeAirports.filter(airport => airport.code !== 'DUB').map(renderAirportOption).join('')}`;
   const arrivalAirportOptions = routeAirports
-    .map(airport => `<option value="${escapeHtml(airport.code)}">${escapeHtml(airport.name)} (${escapeHtml(airport.code)})</option>`).join('');
+    .map(renderAirportOption).join('');
   content.innerHTML = heading('', sections.flightInfo.title, sections.flightInfo.desc)
     + `<form class="flight-form" id="flight-information-form" autocomplete="off">
       <section class="flight-panel flight-route-panel"><div class="flight-panel-head"><h3>Where to today?</h3></div>
