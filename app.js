@@ -830,7 +830,7 @@ function renderFlightInformation() {
           <div class="passenger-counts">
             <label class="flight-field"><span>Business Class</span><input name="business" type="number" min="0" max="30" step="1" inputmode="numeric" placeholder="0"></label>
             <label class="flight-field"><span>Premium Economy</span><input name="premiumEconomy" type="number" min="0" max="28" step="1" inputmode="numeric" placeholder="0"></label>
-            <label class="flight-field"><span>Economy</span><input name="economy" type="number" min="0" inputmode="numeric" placeholder="0"></label>
+            <label class="flight-field"><span>Economy</span><input name="economy" type="number" min="0" max="287" inputmode="numeric" placeholder="0"></label>
           </div>
           <div class="flight-fields passenger-extra">
             <label class="flight-field"><span>No. of INF</span><input name="infants" type="number" min="0" inputmode="numeric" placeholder="0"></label>
@@ -887,7 +887,7 @@ function renderFlightInformation() {
     form.elements.destination.value = allowedArrivals.some(airport => airport.code === selectedArrival) ? selectedArrival : '';
   };
   updateArrivalOptions();
-  const cappedPassengerFields = { business: 30, premiumEconomy: 28 };
+  const cappedPassengerFields = { business: 30, premiumEconomy: 28, economy: 287 };
   const capPassengerCounts = () => {
     Object.entries(cappedPassengerFields).forEach(([name, maximum]) => {
       const field = form.elements[name];
@@ -923,7 +923,6 @@ function renderFlightInformation() {
     pushbackTimeZone.textContent = pushbackZoneLabel
       ? `Time zone used: ${pushbackZoneLabel}`
       : 'Select a departure airport to set the pushback time zone.';
-    content.querySelector('#use-current-pushback-time').disabled = !pushbackZone;
     content.querySelector('#destination-arrival-label').textContent = destination
       ? `ESTIMATED ARRIVAL · ${destination.name.toUpperCase()} LOCAL TIME`
       : 'DESTINATION LOCAL TIME';
@@ -980,8 +979,7 @@ function renderFlightInformation() {
   }
   content.querySelector('#refresh-flight-weather').addEventListener('click', () => updateFlightWeather({ force: true }));
   content.querySelector('#use-current-pushback-time').addEventListener('click', () => {
-    const selectedZone = destinationTimeZones[form.elements.originAirport.value];
-    if (!selectedZone) return;
+    const selectedZone = destinationTimeZones[form.elements.originAirport.value] || 'Europe/Dublin';
     const now = new Date();
     const pad = value => String(value).padStart(2, '0');
     const parts = new Intl.DateTimeFormat('en-CA', { timeZone: selectedZone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(now);
