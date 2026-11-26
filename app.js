@@ -1301,10 +1301,10 @@ function openSection(id, updateRoute = true) {
 
 function renderCrewEssentials() {
   const links = [
-    ['FLIGHT CALCULATOR', 'Enter Flight Information', 'Passenger totals, arrival time estimate and flight notes.', 'flightInfo'],
-    ['DESTINATIONS', 'Open Destination Information', 'Airport, hotel, transport details and station contacts.', 'destinations'],
+    ['FLIGHT PLAN', 'Enter Flight Information', 'Passenger Numbers, Flight Times, ETA and Weather Reports for Departure & Arrival', 'flightInfo'],
+    ['DESTINATIONS', 'Destination Information', 'Airport, hotel, transport details and station contacts.', 'destinations'],
     ['FLIGHT & DUTY', 'Check Duty References', 'Basic FDP, acclimatisation and ninth crew member guidance.', 'flight'],
-    ['CREW RESOURCES', 'Open useful links and contacts', 'Company resources, forms, telephone and email contacts.', 'contacts']
+    ['CREW RESOURCES', 'Useful Links & Contacts', 'Company resources, forms, telephone and email contacts.', 'contacts']
   ];
   content.innerHTML = heading('', sections.essentials.title, sections.essentials.desc)
     + `<div class="card-grid essentials-grid">${links.map(([tag, title, detail, section]) => `<button type="button" class="card essentials-card" data-essential="${section}"><span class="card-tag">${tag}</span><h3>${title}</h3><p>${detail}</p><span class="essentials-open">Open →</span></button>`).join('')}</div>`;
