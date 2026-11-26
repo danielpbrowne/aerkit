@@ -140,10 +140,6 @@ function heading(kicker, title, description) {
   return `<div class="section-head"><div>${kicker ? `<span class="section-kicker">${escapeHtml(kicker)}</span>` : ''}<h2>${escapeHtml(title)}</h2></div>${description ? `<p>${escapeHtml(description)}</p>` : ''}</div>`;
 }
 
-function caution(text) {
-  return `<div class="notice">${escapeHtml(text)}</div>`;
-}
-
 function renderUsefulContacts() {
   const renderGroup = (title, entries) => `<section class="useful-link-card"><h3>${escapeHtml(title)}</h3><div class="useful-link-list">${entries.map(entry => `<a class="useful-resource-link" href="${escapeHtml(entry.url)}" target="_blank" rel="noopener noreferrer"><span>${escapeHtml(entry.title)}</span><b aria-hidden="true">↗</b></a>`).join('')}</div></section>`;
   const contacts = (data.usefulContacts || []).map(contact => {
@@ -234,7 +230,6 @@ function renderCards(cards, gridClass = '') {
     if (card[0] === 'BID WINDOWS') return renderBidWindowsCard();
     if (card[0] === 'CREDITS') return renderCreditDatesCard();
     if (card[0] === 'EXPENSES') return renderOvernightAllowancesCard();
-    return `<article class="card"><span class="card-tag">${escapeHtml(card[0])}</span><h3>${escapeHtml(card[1])}</h3><p>${escapeHtml(card[2])}</p></article>`;
   }).join('')}</div>`;
 }
 
