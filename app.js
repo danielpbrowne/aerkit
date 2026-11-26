@@ -967,16 +967,16 @@ function renderFlightInformation() {
     capPassengerCounts();
     updateFlightSummary();
   };
-  form.addEventListener('input', handleFlightInput);
-  form.addEventListener('change', handleFlightInput);
   const weatherFields = ['destination', 'originAirport', 'pushback', 'flightHours', 'flightMinutes', 'taxiMinutes'];
   const scheduleWeatherUpdate = event => {
     if (!weatherFields.includes(event.target.name)) return;
     clearTimeout(flightWeatherUpdateTimer);
     flightWeatherUpdateTimer = setTimeout(() => updateFlightWeather(), 450);
   };
-  form.addEventListener('input', scheduleWeatherUpdate);
-  form.addEventListener('change', scheduleWeatherUpdate);
+  for (const type of ['input', 'change']) {
+    form.addEventListener(type, handleFlightInput);
+    form.addEventListener(type, scheduleWeatherUpdate);
+  }
   content.querySelector('#refresh-flight-weather').addEventListener('click', () => updateFlightWeather({ force: true }));
   content.querySelector('#use-current-pushback-time').addEventListener('click', () => {
     const selectedZone = destinationTimeZones[form.elements.originAirport.value];
@@ -1337,7 +1337,7 @@ document.querySelector('.home-button').addEventListener('click', event => {
 
 const searchable = [
   ...data.destinations.map(destination => ({ id: 'destinations', title: destination.name, tag: destination.code, detail: `${destination.country} · ${destination.routeStatus}`, destinationCode: destination.code, group: 'Destinations' })),
-  ...data.destinationFacts.map((fact, index) => ({ id: 'destinations', title: fact.field, tag: `${fact.destination} · ${fact.code}`, detail: fact.value, destinationCode: fact.code, destinationName: fact.destination, group: `${fact.destination} · ${fact.category}`, targetId: `destination-fact-${index}` })),
+  ...data.destinationFacts.map((fact, index) => ({ id: 'destinations', title: fact.field, tag: `${fact.destination} · ${fact.code}`, detail: fact.value, destinationCode: fact.code, group: `${fact.destination} · ${fact.category}`, targetId: `destination-fact-${index}` })),
   ...aircraftConfigurations().flatMap(aircraft => [
     { id: 'aircraft', title: aircraft.type, tag: 'AIRCRAFT', detail: `${aircraft.total} passenger seats · ${aircraft.registrations.join(', ')}`, aircraftId: aircraftId(aircraft), group: 'Aircraft' },
     ...aircraft.registrations.map(registration => ({ id: 'aircraft', title: registration, tag: aircraft.type, detail: `${aircraft.total} passenger seats · ${aircraft.cabinCrewSeats} cabin crew seats`, aircraftId: aircraftId(aircraft), group: 'Aircraft' }))
