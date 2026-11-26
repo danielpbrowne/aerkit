@@ -840,7 +840,7 @@ function renderFlightInformation() {
         </section>
         <section class="flight-panel"><div class="flight-panel-head"><h3>Flight Times</h3></div>
           <div class="flight-fields">
-            <div class="flight-pushback-row"><div class="flight-field pushback-time-field"><label for="pushback-time">Pushback time</label><input id="pushback-time" name="pushback" type="datetime-local" aria-describedby="pushback-time-zone"><small id="pushback-time-zone" role="status" aria-live="polite">Select a departure airport to set the time zone.</small></div><button class="current-time-button" type="button" id="use-current-pushback-time">Now</button></div>
+            <div class="flight-pushback-row"><div class="flight-field pushback-time-field"><span>Pushback date &amp; time</span><div class="pushback-date-time-inputs"><label>Date<input id="pushback-date" name="pushbackDate" type="date" aria-label="Pushback date"></label><label>Time<input id="pushback-clock" name="pushbackClock" type="time" aria-label="Pushback time"></label></div><input id="pushback-combined-value" name="pushback" type="hidden"><small id="pushback-time-zone" role="status" aria-live="polite">Select a departure airport to set the time zone.</small><button class="current-time-button" type="button" id="use-current-pushback-time">Select Current Date &amp; Time</button></div></div>
             <div class="flight-duration-pair">
               <label class="flight-field taxi-minutes-field"><span>Taxi (mins)</span><input name="taxiMinutes" type="number" min="1" step="1" inputmode="numeric" placeholder="0"></label>
               <fieldset class="flight-field duration-field"><legend>Flight Time</legend><div><label><input name="flightHours" type="number" min="0" max="30" inputmode="numeric" placeholder="0"><small>hours</small></label><b>:</b><label><input name="flightMinutes" type="number" min="0" max="59" inputmode="numeric" placeholder="00"><small>minutes</small></label></div></fieldset>
@@ -888,6 +888,11 @@ function renderFlightInformation() {
   };
   updateArrivalOptions();
   const cappedPassengerFields = { business: 30, premiumEconomy: 28, economy: 287 };
+  const syncPushbackValue = () => {
+    const date = form.elements.pushbackDate.value;
+    const time = form.elements.pushbackClock.value;
+    form.elements.pushback.value = date && time ? `${date}T${time}` : '';
+  };
   const capPassengerCounts = () => {
     Object.entries(cappedPassengerFields).forEach(([name, maximum]) => {
       const field = form.elements[name];
@@ -964,10 +969,11 @@ function renderFlightInformation() {
 
   const handleFlightInput = event => {
     if (event.target.name === 'originAirport') updateArrivalOptions();
+    if (event.target.name === 'pushbackDate' || event.target.name === 'pushbackClock') syncPushbackValue();
     capPassengerCounts();
     updateFlightSummary();
   };
-  const weatherFields = ['destination', 'originAirport', 'pushback', 'flightHours', 'flightMinutes', 'taxiMinutes'];
+  const weatherFields = ['destination', 'originAirport', 'pushback', 'pushbackDate', 'pushbackClock', 'flightHours', 'flightMinutes', 'taxiMinutes'];
   const scheduleWeatherUpdate = event => {
     if (!weatherFields.includes(event.target.name)) return;
     clearTimeout(flightWeatherUpdateTimer);
@@ -979,13 +985,20 @@ function renderFlightInformation() {
   }
   content.querySelector('#refresh-flight-weather').addEventListener('click', () => updateFlightWeather({ force: true }));
   content.querySelector('#use-current-pushback-time').addEventListener('click', () => {
-    const selectedZone = destinationTimeZones[form.elements.originAirport.value] || 'Europe/Dublin';
+    const selectedZone = destinationTimeZones[form.elements.originAirport.value];
     const now = new Date();
     const pad = value => String(value).padStart(2, '0');
-    const parts = new Intl.DateTimeFormat('en-CA', { timeZone: selectedZone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(now);
-    const part = type => parts.find(item => item.type === type)?.value;
-    form.elements.pushback.value = `${part('year')}-${part('month')}-${part('day')}T${pad(Number(part('hour')))}:${pad(Number(part('minute')))}`;
-    form.elements.pushback.dispatchEvent(new Event('input', { bubbles: true }));
+    const parts = selectedZone
+      ? new Intl.DateTimeFormat('en-CA', { timeZone: selectedZone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(now)
+      : null;
+    const part = type => parts?.find(item => item.type === type)?.value;
+    form.elements.pushbackDate.value = selectedZone
+      ? `${part('year')}-${part('month')}-${part('day')}`
+      : `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+    form.elements.pushbackClock.value = selectedZone
+      ? `${pad(Number(part('hour')))}:${pad(Number(part('minute')))}`
+      : `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    form.elements.pushbackClock.dispatchEvent(new Event('input', { bubbles: true }));
   });
   window.addEventListener('pagehide', () => form.reset(), { once: true });
   updateFlightSummary();
