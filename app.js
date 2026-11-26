@@ -55,7 +55,7 @@ const sections = {
     ]
   },
   crew: {
-    title: 'Credits & Payments', desc: '',
+    title: 'Payments & Allowances', desc: '',
     cards: [
       ['CREDITS', 'Credits & payment dates', 'Select a pay period to view its payroll and credit dates.'],
       ['COMMISSION', 'Commission', 'Current commission policy, calculation and payroll timing.'],
