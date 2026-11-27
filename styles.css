@@ -26,12 +26,14 @@ body{margin:0;background:var(--canvas);color:var(--ink);font:19px/1.55 Urbanist,
 .home-button{display:inline-flex;min-height:40px;align-items:center;gap:7px;padding:7px 13px;border:1px solid #697a82;border-radius:20px;color:#f7f7f2;text-decoration:none;font:600 14px Urbanist,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 .home-button:hover{background:#294354}.home-button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 main{max-width:1120px;margin:auto;padding:0 30px}
-.welcome{position:relative;display:flex;gap:24px;min-height:200px;margin-top:35px;background:var(--navy);overflow:hidden;border-radius:8px;color:#f8f8f3;padding:30px 54px;align-items:center;box-shadow:var(--shadow)}
-.welcome-logo{position:relative;z-index:1;width:123px;height:123px;flex:0 0 auto;object-fit:contain;border-radius:12px}
+.welcome{position:relative;display:grid;grid-template-columns:minmax(0,1fr);align-content:center;gap:14px;min-height:200px;margin-top:35px;background:var(--navy);overflow:hidden;border-radius:8px;color:#f8f8f3;padding:30px 54px;box-shadow:var(--shadow)}
+.welcome-brand{position:relative;z-index:1;display:flex;align-items:center;gap:22px}
+.welcome-logo{position:relative;z-index:1;width:96px;height:96px;flex:0 0 auto;object-fit:contain;border-radius:12px}
 .welcome-copy{position:relative;z-index:1;max-width:590px}
 .eyebrow,.section-kicker{font:13px ui-monospace,SFMono-Regular,monospace;letter-spacing:.12em;color:#e3c66d}
 .welcome-copy>.eyebrow{font:700 clamp(32px,4vw,42px)/1.08 Outfit,Urbanist,sans-serif;letter-spacing:.01em;color:#e3c66d;text-transform:none;margin:0}
-.intro{font-size:18px;color:#d5dedf;max-width:440px;margin:12px 0 0}
+.intro{position:relative;z-index:1;font-size:18px;line-height:1.4;color:#d5dedf;max-width:none;margin:0}
+.intro-title{font-size:calc(1em + 1pt);font-weight:700}
 .welcome-region{display:block;font-size:80%;font-weight:700;line-height:1.25;margin-top:3px}
 .welcome-art{position:absolute;right:5%;top:0;width:40%;height:100%;opacity:.95}
 .sun{position:absolute;width:172px;height:172px;border:1px solid #d6c17445;border-radius:50%;top:48px;right:27px;background:radial-gradient(circle,#d8c57a12 0 55%,transparent 56%)}
@@ -93,17 +95,17 @@ main{max-width:1120px;margin:auto;padding:0 30px}
 .destination-tools input:focus,.destination-tools select:focus{outline:2px solid #8ea39b;outline-offset:1px}
 .destination-result-count{margin:8px 1px 10px;color:var(--muted);font:12px ui-monospace,SFMono-Regular,monospace}
 .destination-list{grid-template-columns:repeat(3,minmax(0,1fr))}
-.destination{display:flex;min-width:0;min-height:100px;flex-direction:column;align-items:stretch;justify-content:center;gap:11px;padding:15px 16px}
-.destination-main,.destination-details{display:flex;min-width:0;align-items:center;justify-content:space-between;gap:8px}
+.destination{display:flex;min-width:0;min-height:112px;flex-direction:column;align-items:stretch;justify-content:center;gap:15px;padding:17px 16px}
+.destination-main,.destination-details{display:flex;min-width:0;align-items:center;justify-content:space-between;gap:8px}.destination-details{padding-top:11px;border-top:1px solid var(--line)}
 .destination-main strong{overflow:hidden;color:var(--navy-deep);font:600 18px/1.15 Outfit,Urbanist,sans-serif;text-overflow:ellipsis;white-space:nowrap}
 .destination .destination-code{flex:none;color:#8d773d;font:600 18px/1.15 ui-monospace,SFMono-Regular,monospace;letter-spacing:.05em}
 .destination .destination-status{flex:none;padding:3px 7px;border-radius:10px;background:#e7efe6;color:#386449;font:600 10px/1.25 ui-monospace,SFMono-Regular,monospace;white-space:nowrap}
 .destination .destination-status.is-seasonal{background:#f5edcf;color:#705c20}
-.destination-aircraft{display:flex;flex-wrap:wrap;align-items:center;gap:5px}.destination .destination-aircraft-tag{flex:none;padding:3px 7px;border:1px solid #d4dedb;border-radius:10px;background:#edf1ef;color:#49605b;font:600 10px/1.25 ui-monospace,SFMono-Regular,monospace;white-space:nowrap}.destination .destination-aircraft-tag.is-seasonal{border-color:#eadcae;background:#f5edcf;color:#705c20}
+.destination-aircraft{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.destination .destination-aircraft-tag{flex:none;padding:3px 7px;border:1px solid #d4dedb;border-radius:10px;background:#edf1ef;color:#49605b;font:600 10px/1.25 ui-monospace,SFMono-Regular,monospace;white-space:nowrap}.destination .destination-aircraft-tag.is-seasonal{border-color:#eadcae;background:#f5edcf;color:#705c20}
 .destination-empty{grid-column:1/-1;display:flex;flex-direction:column;gap:3px;padding:22px;border:1px dashed var(--line);border-radius:6px;color:var(--muted);font-size:14px}
 .destination-empty strong{color:var(--ink);font-size:16px}
 @media(max-width:760px){.destination-tools{grid-template-columns:1fr 1fr}.destination-search{grid-column:1/-1}.destination-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.destination-tools{gap:8px;margin-top:13px;padding:11px}.destination-tools input,.destination-tools select{min-height:42px;font-size:14px}.destination{min-height:120px;padding:15px 12px;gap:12px}.destination-main strong,.destination .destination-code{font-size:16px}.destination-details{align-items:flex-start;flex-direction:column;gap:7px}.destination-details>span:first-child{max-width:100%}}
+@media(max-width:600px){.destination-tools{gap:8px;margin-top:13px;padding:11px}.destination-tools input,.destination-tools select{min-height:42px;font-size:14px}.destination{min-height:120px;padding:14px 10px;gap:14px}.destination-main strong,.destination .destination-code{font-size:16px}.destination-details{align-items:flex-start;flex-direction:column;gap:9px}.destination-details>span:first-child{max-width:100%}}
 .empty{background:var(--paper);border:1px dashed #c3cdd0;border-radius:6px;padding:26px;color:var(--muted);font-size:16px}
 .empty strong{color:var(--ink);display:block;margin-bottom:5px}
 .profile-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;background:var(--navy);color:#f7f7f2;border-radius:7px;padding:14px 17px;margin:0 0 12px;box-shadow:var(--shadow)}
@@ -166,8 +168,8 @@ main{max-width:1120px;margin:auto;padding:0 30px}
 .aircraft-rest-status.is-yes{background:#c9e6c6;color:#205b27;border:1px solid #78a975}
 .aircraft-rest-status.is-no{background:#f4cfcb;color:#8f211c;border:1px solid #d58c85}
 footer{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:26px 0 35px;margin-top:37px;border-top:1px solid #d2dadd;font:12px ui-monospace,SFMono-Regular,monospace;letter-spacing:.06em;color:#76858a}
-@media(max-width:760px){main{padding:0 17px}.topbar{height:66px;padding:0 17px}.welcome{gap:18px;min-height:170px;margin-top:18px;padding:26px}.welcome-logo{width:97px;height:97px;border-radius:9px}.welcome-art{width:45%;right:-9%;opacity:.55}.welcome-copy{max-width:420px}.section-navigation{top:66px;z-index:9}.card-grid,.destination-list{grid-template-columns:repeat(2,1fr)}.section-head{display:block}.section-head p{margin-top:6px}footer{gap:12px;flex-wrap:wrap}}
-@media(max-width:480px){.welcome{gap:14px;padding:24px 18px;min-height:155px}.welcome-logo{width:73px;height:73px;border-radius:7px}.welcome-copy>.eyebrow{font-size:clamp(28px,8vw,34px)}.intro{max-width:260px;font-size:16px;line-height:1.35;margin-top:8px}.welcome-art{right:-28%;width:65%;opacity:.36}.card-grid,.destination-list,.detail-layout{grid-template-columns:1fr}.icon-button{padding:7px 10px}}
+@media(max-width:760px){main{padding:0 17px}.topbar{height:66px;padding:0 17px}.welcome{gap:12px;min-height:170px;margin-top:18px;padding:26px}.welcome-brand{gap:16px}.welcome-logo{width:84px;height:84px;border-radius:9px}.welcome-art{width:45%;right:-9%;opacity:.55}.welcome-copy{max-width:420px}.section-navigation{top:66px;z-index:9}.card-grid,.destination-list{grid-template-columns:repeat(2,1fr)}.section-head{display:block}.section-head p{margin-top:6px}footer{gap:12px;flex-wrap:wrap}}
+@media(max-width:480px){.welcome{gap:12px;padding:20px 18px;min-height:155px}.welcome-brand{gap:14px}.welcome-logo{width:68px;height:68px;border-radius:7px}.welcome-copy>.eyebrow{font-size:clamp(28px,8vw,34px)}.intro{max-width:none;font-size:16px;line-height:1.4;margin:0}.welcome-art{right:-28%;width:65%;opacity:.36}.card-grid,.destination-list,.detail-layout{grid-template-columns:1fr}.icon-button{padding:7px 10px}}
 @media(max-width:600px){
   html{scroll-padding-top:82px}
   body{overflow-x:hidden;-webkit-text-size-adjust:100%}
@@ -176,14 +178,14 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:14px;pa
   main{width:100%;padding:0 15px}
   .welcome{min-height:145px;margin-top:14px;padding:20px 21px;border-radius:7px}
   .welcome-copy{max-width:100%}
-  .intro{max-width:285px;font-size:17px;line-height:1.5;margin-top:12px}
+  .intro{max-width:none;font-size:16px;line-height:1.45;margin:0}
   .welcome-art{right:-6%;width:39%;opacity:.36}.sun{width:128px;height:128px;right:8px;top:42px}.route-line{width:195px;height:106px;top:85px;right:-27px}.plane{right:102px;top:83px;font-size:16px}.art-label{right:0;bottom:20px;font-size:10px}
   .section-navigation{top:calc(60px + env(safe-area-inset-top));z-index:9;margin:0 0 22px;padding-top:14px}
   .content-area{min-height:190px;scroll-margin-top:78px}
   .section-head{margin-bottom:14px}.section-head h2{font-size:28px;line-height:1.12}.section-head p{font-size:16px;line-height:1.5}
   .notice{font-size:15px;line-height:1.5;padding:11px 12px;margin-bottom:12px}
-  .destination-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-  .destination{min-height:54px;padding:11px 12px;gap:5px}.destination strong{font-size:16px}.destination span{font-size:11px;white-space:nowrap}
+  .destination-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .destination{min-height:120px;padding:14px 10px;gap:14px}.destination strong{font-size:16px}.destination span{font-size:11px;white-space:nowrap}
   .card-grid,.detail-layout,.aircraft-grid{grid-template-columns:1fr;gap:9px}
   .aircraft-grid{row-gap:15px}
   .profile-meta{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);grid-template-rows:auto auto;gap:12px 10px;padding:13px 14px}
@@ -200,7 +202,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:14px;pa
 }
 @media(max-width:360px){
   .topbar{padding-left:11px;padding-right:11px}.top-actions{gap:6px}.home-button{min-height:38px;padding:6px 10px}
-  main{padding-left:11px;padding-right:11px}.welcome{padding-left:17px;padding-right:17px}.destination{padding:10px 9px}.destination strong{font-size:15px}
+  main{padding-left:11px;padding-right:11px}.welcome{padding-left:17px;padding-right:17px}.destination{padding:18px 12px}.destination strong{font-size:15px}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 
@@ -315,5 +317,5 @@ html[data-theme="dark"] footer{border-color:var(--line)}
 @media(max-width:760px){.ife-reference-grid{grid-template-columns:1fr}}
 .pushback-time-field{min-width:0;width:100%}
 .essentials-card{display:block;width:100%;min-height:170px;text-align:left;cursor:pointer}.essentials-card:hover,.essentials-card:focus-visible{border-color:#9f8a4a;transform:translateY(-2px)}.essentials-card h3{margin:10px 0 6px;color:var(--navy-deep);font:600 20px Outfit,Urbanist,sans-serif}.essentials-card p{margin:0;color:var(--muted);font-size:15px;line-height:1.45}.essentials-open{display:block;margin-top:16px;color:#176b68;font-weight:700}.flight-footer-actions{display:flex;gap:8px}.flight-footer-actions .clear-flight-button{width:auto}
-
-.test-version-badge{display:inline-flex;align-items:center;margin-bottom:8px;padding:5px 9px;border:1px solid #e3c66d;border-radius:999px;background:#e3c66d;color:#142b3b;font:700 11px/1.15 ui-monospace,SFMono-Regular,monospace;letter-spacing:.1em}
+.welcome-copy>.eyebrow{font-size:clamp(36px,4.5vw,46px)}
+@media(max-width:480px){.welcome-copy>.eyebrow{font-size:clamp(32px,9vw,38px)}}

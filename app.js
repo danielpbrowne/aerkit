@@ -1,7 +1,7 @@
 const data = window.CSM_DATA;
 const sections = {
   essentials: { title: 'Quick Access', desc: 'Quick access to the most frequently visited tools.' },
-  destinations: { title: 'Where We Fly', desc: 'Pick your destination to view Airport, Hotel & Transport Information.' },
+  destinations: { title: 'Where We Fly', desc: 'Tap a location to view Airport, Hotel & Transport Information.' },
   aircraft: { title: 'Aircraft Type', desc: 'Aircraft Seating Capacity and Registrations' },
   flightInfo: { title: 'Flight Plan', desc: '' },
   flight: {
