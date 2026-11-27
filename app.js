@@ -186,8 +186,8 @@ function initFeedbackPage() {
     destinationWrap.hidden = !needsDestination;
     destination.required = needsDestination;
     if (!needsDestination) destination.value = '';
-    detailLabel.textContent = idea ? 'App Idea Suggestion' : 'Suggested Correction';
-    detail.placeholder = idea ? 'Describe the app idea or improvement' : 'Describe the suggested correction';
+    detailLabel.textContent = 'Suggestion';
+    detail.placeholder = idea ? 'Describe the app idea or improvement' : 'Describe your suggestion';
   };
   category.addEventListener('change', updateFields);
   form.addEventListener('reset', () => setTimeout(updateFields));
