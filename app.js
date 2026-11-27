@@ -930,7 +930,7 @@ function renderFlightInformation() {
           <p id="flight-weather-status" class="flight-weather-status" role="status" aria-live="polite">Forecasts are supplied by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>.</p>
         </section>
       </div>
-      <div class="flight-form-footer"><div class="flight-footer-actions"><button class="clear-flight-button" type="button" id="show-flight-snapshot">Flight Snapshot</button><button class="clear-flight-button" type="button" id="clear-flight-information">Clear Flight Information</button></div></div>
+      <div class="flight-form-footer"><div class="flight-footer-actions"><button class="clear-flight-button" type="button" id="export-flight-information">Export Flight Information</button><button class="clear-flight-button" type="button" id="show-flight-snapshot">Flight Snapshot</button><button class="clear-flight-button" type="button" id="clear-flight-information">Clear Flight Information</button></div></div>
     </form>
     <dialog class="flight-snapshot-dialog" id="flight-snapshot-dialog" aria-labelledby="flight-snapshot-title">
       <article class="flight-snapshot-card">
@@ -1068,6 +1068,7 @@ function renderFlightInformation() {
     updateFlightSummary();
     updateFlightWeather();
   });
+  content.querySelector('#export-flight-information').addEventListener('click', () => exportFlightInformation(form));
   content.querySelector('#show-flight-snapshot').addEventListener('click', () => {
     const values = Object.fromEntries(new FormData(form).entries());
     const destination = getFlightAirport(values.destination)?.name || 'Not selected';
@@ -1123,6 +1124,43 @@ function renderFlightInformation() {
   const snapshotDialog = content.querySelector('#flight-snapshot-dialog');
   snapshotDialog.querySelector('.snapshot-close').addEventListener('click', () => snapshotDialog.close());
   snapshotDialog.addEventListener('click', event => { if (event.target === snapshotDialog) snapshotDialog.close(); });
+}
+
+function exportFlightInformation(form) {
+  const values = Object.fromEntries(new FormData(form).entries());
+  const airport = code => getFlightAirport(code)?.name || 'Not selected';
+  const origin = airport(values.originAirport);
+  const destination = airport(values.destination);
+  const timeZone = destinationTimeZones[values.originAirport];
+  const pushbackDate = values.pushback && timeZone ? wallTimeToDate(values.pushback, timeZone) : null;
+  const pushback = pushbackDate && Number.isFinite(pushbackDate.getTime()) ? formatFlightTime(pushbackDate, timeZone) : 'Not entered';
+  const arrivalDublin = document.querySelector('#estimated-arrival-dublin')?.textContent || 'Not calculated';
+  const arrivalLocal = document.querySelector('#estimated-arrival-destination')?.textContent || 'Not calculated';
+  const generated = new Intl.DateTimeFormat('en-IE', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date());
+  const count = name => String(Math.max(0, Number(values[name]) || 0));
+  const prm = ['prmWhcr', 'prmWchs', 'prmWchsOther'].reduce((sum, name) => sum + Math.max(0, Number(values[name]) || 0), 0);
+  const row = (label, value) => `<div class="metric"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`;
+  const weather = role => {
+    const panel = document.querySelector(`#flight-weather-${role}`);
+    const details = Object.fromEntries([...(panel?.querySelectorAll('dt') || [])].map(term => [term.textContent.trim().toLowerCase(), term.nextElementSibling?.textContent.trim() || '']));
+    const forecast = panel?.querySelector('.weather-forecast-time')?.textContent.trim().replace(/^Forecast for /i, '') || 'Forecast unavailable';
+    return { forecast, temperature: details.temperature || 'Unavailable', wind: details.wind || 'Unavailable' };
+  };
+  const departureWeather = weather('origin');
+  const arrivalWeather = weather('destination');
+  const notes = values.flightInformation?.trim() || 'None';
+  const popup = window.open('', '_blank');
+  if (!popup) { alert('Allow pop-ups to create the Flight Information PDF.'); return; }
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Flight Information</title><style>
+    @page{size:A4;margin:14mm}*{box-sizing:border-box}body{margin:0;color:#172a35;font:12px/1.45 Arial,sans-serif}.header{background:#142b3b;color:#fff;padding:24px 28px 20px;position:relative}.header h1{font-size:28px;line-height:1.1;margin:0 0 15px}.generated{font-size:10px;color:#dbe2e3}.generated strong{display:block;color:#fff;font-size:12px;margin-top:2px}.body{padding:18px 0}.route{display:grid;grid-template-columns:1fr 1.6fr 1fr;align-items:center;gap:14px;padding:16px 18px;border:1px solid #d5ddde;border-radius:5px;background:#f4f6f3;margin-bottom:16px}.airport:last-child{text-align:right}.airport strong{display:block;font-size:22px;color:#142b3b}.airport span,.label{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#697b80;font-weight:bold}.route-line{height:28px;position:relative;display:flex;align-items:center;justify-content:center}.route-line:before{content:"";position:absolute;left:5px;right:5px;top:50%;border-top:2px solid #142b3b}.dot{position:absolute;top:50%;width:10px;height:10px;border:2px solid #142b3b;border-radius:50%;background:white;transform:translateY(-50%)}.dot.start{left:0}.dot.end{right:0}.plane{position:relative;background:#f4f6f3;padding:0 8px;font-size:20px;line-height:1}.section{margin:0 0 13px;break-inside:avoid}.section h2{font-size:15px;line-height:1.2;margin:0 0 11px;padding-bottom:7px;border-bottom:1px solid #aeb9ba;color:#142b3b}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.metrics.two{grid-template-columns:repeat(2,minmax(0,1fr))}.metric{padding:10px 11px;border:1px solid #d5ddde;border-radius:4px;min-height:54px}.metric span{display:block;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:#697b80;font-weight:bold;margin-bottom:4px}.metric strong{font-size:14px;overflow-wrap:anywhere}.passengers{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:10px}.passenger{padding:8px;border:1px solid #d5ddde;border-radius:4px}.passenger span{display:block;color:#697b80;font-size:9px;text-transform:uppercase;font-weight:bold}.passenger strong{font-size:15px}.total{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:2px solid #142b3b;border-radius:4px;font-weight:bold}.weather{display:grid;grid-template-columns:1fr 1fr;gap:10px}.weather-card{padding:10px;border:1px solid #d5ddde;border-radius:4px}.weather-card h3{font-size:13px;margin:0 0 6px}.weather-card p{margin:3px 0}.notes{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}.notes-section{break-inside:auto}.notes-section h2{break-after:avoid}.muted{color:#697b80}@media print{body{print-color-adjust:exact;-webkit-print-color-adjust:exact}.header{break-inside:avoid}.section{break-inside:avoid}.notes-section{break-inside:auto}}
+    </style></head><body><header class="header"><h1>Flight Information</h1><div class="generated">Date Report Generated<strong>${escapeHtml(generated)}</strong></div></header><main class="body">
+    <section class="route"><div class="airport"><span>Departure</span><strong>${escapeHtml(origin)}</strong><span>${escapeHtml(values.originAirport || '')}</span></div><div class="route-line"><i class="dot start"></i><span class="plane" aria-label="Aircraft">✈</span><i class="dot end"></i></div><div class="airport"><span>Arrival</span><strong>${escapeHtml(destination)}</strong><span>${escapeHtml(values.destination || '')}</span></div></section>
+    <section class="section"><h2>Flight Times</h2><div class="metrics">${row('Pushback', pushback)}${row('Taxi', values.taxiMinutes ? `${values.taxiMinutes} min` : 'Not entered')}${row('Flight Time', `${values.flightHours || '0'}h ${values.flightMinutes || '0'}m`)}</div></section>
+    <section class="section"><h2>Estimated Arrival</h2><div class="metrics two">${row('Estimated Arrival in Dublin', arrivalDublin)}${row(`Estimated Local Arrival · ${destination}`, arrivalLocal)}</div></section>
+    <section class="section"><h2>Passenger Breakdown</h2><div class="passengers">${[['Business',count('business')],['Premium Economy',count('premiumEconomy')],['Economy',count('economy')],['Infants',count('infants')],['PRM',String(prm)]].map(([label,value])=>`<div class="passenger"><span>${label}</span><strong>${value}</strong></div>`).join('')}</div><div class="total"><span>Total Passengers Including Infants</span><strong>${['business','premiumEconomy','economy','infants'].reduce((sum,name)=>sum+Math.max(0,Number(values[name])||0),0)}</strong></div></section>
+    <section class="section"><h2>Route Weather</h2><div class="weather">${[[`Departure · ${origin}`,departureWeather],[`Arrival · ${destination}`,arrivalWeather]].map(([label,w])=>`<article class="weather-card"><h3>${escapeHtml(label)}</h3><p class="muted">Forecast time: ${escapeHtml(w.forecast)}</p><p><b>Temperature:</b> ${escapeHtml(w.temperature)}</p><p><b>Wind:</b> ${escapeHtml(w.wind)}</p></article>`).join('')}</div></section>
+    <section class="section notes-section"><h2>Flight Notes</h2><div class="notes">${escapeHtml(notes)}</div></section></main><script>window.addEventListener('load',()=>setTimeout(()=>window.print(),250));</script></body></html>`;
+  popup.document.open(); popup.document.write(html); popup.document.close();
 }
 
 function formatFlightTime(date, timeZone) {
