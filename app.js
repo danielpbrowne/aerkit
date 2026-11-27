@@ -1126,41 +1126,253 @@ function renderFlightInformation() {
   snapshotDialog.addEventListener('click', event => { if (event.target === snapshotDialog) snapshotDialog.close(); });
 }
 
+function flightPdfText(value) {
+  return String(value ?? '')
+    .replace(/[→➜]/g, ' -> ')
+    .replace(/[–—]/g, '-')
+    .replace(/[·•]/g, ' | ')
+    .replace(/°/g, ' deg ')
+    .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\x20-\x7e]/g, '?');
+}
+
+function buildFlightInformationPdf(sections) {
+  const pageWidth = 595;
+  const pageHeight = 842;
+  const left = 48;
+  const right = 547;
+  const contentWidth = right - left;
+  const pages = [];
+  let commands;
+  let y;
+  const escapePdf = value => flightPdfText(value).replace(/([\\()])/g, '\\$1');
+  const text = (value, x, top, size = 10, bold = false, color = '0.13 0.22 0.28') => {
+    commands.push(`${color} rg BT /${bold ? 'F2' : 'F1'} ${size} Tf 1 0 0 1 ${x} ${top - size} Tm (${escapePdf(value)}) Tj ET`);
+  };
+  const rect = (x, top, width, height, color) => commands.push(`${color} rg ${x} ${top - height} ${width} ${height} re f`);
+  const startPage = () => {
+    commands = ['1 1 1 rg 0 0 595 842 re f', '0.08 0.17 0.23 rg 0 766 595 76 re f'];
+    text('Flight Information', left, 820, 22, true, '1 1 1');
+    text('Date Report Generated', right - 157, 815, 7, true, '0.89 0.78 0.43');
+    text(new Intl.DateTimeFormat('en-IE', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date()), right - 157, 801, 8, false, '0.88 0.91 0.90');
+    y = 748;
+    pages.push(commands);
+  };
+  const wrap = (value, maxChars = 86) => {
+    const lines = [];
+    for (const paragraph of String(value ?? '').split(/\r?\n/)) {
+      let line = '';
+      for (const word of flightPdfText(paragraph).split(/\s+/)) {
+        if (!word) continue;
+        if (word.length > maxChars) {
+          if (line) lines.push(line);
+          line = '';
+          for (let index = 0; index < word.length; index += maxChars) lines.push(word.slice(index, index + maxChars));
+        } else if (!line || `${line} ${word}`.length <= maxChars) line = line ? `${line} ${word}` : word;
+        else { lines.push(line); line = word; }
+      }
+      lines.push(line);
+    }
+    return lines.length ? lines : [''];
+  };
+  const ensureSpace = height => { if (y - height < 62) startPage(); };
+  const sectionHeading = title => {
+    text(title.toUpperCase(), left, y, 9, true, '0.09 0.42 0.40');
+    commands.push(`0.09 0.42 0.40 RG 0.7 w ${left} ${y - 14} m ${right} ${y - 14} l S`);
+    y -= 26;
+  };
+  const field = (label, value, x, top, width, options = {}) => {
+    const { valueSize = 11, maxChars = Math.max(16, Math.floor(width / (valueSize * 0.53))), color = '0.13 0.22 0.28', labelColor = '0.40 0.49 0.49' } = options;
+    text(label.toUpperCase(), x, top, 7, true, labelColor);
+    const lines = wrap(value, maxChars);
+    lines.forEach((line, index) => text(line, x, top - 13 - (index * 13), valueSize, index === 0, color));
+    return 26 + Math.max(0, lines.length - 1) * 13;
+  };
+
+  startPage();
+  const route = sections.find(section => section.title === 'Route')?.rows || [];
+  const routeOrigin = route.find(([label]) => label === 'Departure')?.[1] || 'Not selected';
+  const routeDestination = route.find(([label]) => label === 'Arrival')?.[1] || 'Not selected';
+  ensureSpace(114);
+  rect(left, y, contentWidth, 102, '0.08 0.17 0.23');
+  text('PLANNED ROUTE', left + 16, y - 15, 8, true, '0.89 0.78 0.43');
+  const routeMid = left + contentWidth / 2;
+  field('Departure', routeOrigin, left + 16, y - 33, contentWidth / 2 - 28, { valueSize: 14, maxChars: 24, color: '1 1 1', labelColor: '0.89 0.78 0.43' });
+  field('Arrival', routeDestination, routeMid + 18, y - 33, contentWidth / 2 - 34, { valueSize: 14, maxChars: 24, color: '1 1 1', labelColor: '0.89 0.78 0.43' });
+  const routeLineY = y - 79;
+  commands.push(`0.89 0.78 0.43 RG 1.2 w ${left + 40} ${routeLineY} m ${right - 40} ${routeLineY} l S`);
+  const endpoint = x => {
+    const radius = 3;
+    const curve = radius * 0.5523;
+    commands.push(`0.89 0.78 0.43 rg ${x} ${routeLineY - radius} m ${x + curve} ${routeLineY - radius} ${x + radius} ${routeLineY - curve} ${x + radius} ${routeLineY} c ${x + radius} ${routeLineY + curve} ${x + curve} ${routeLineY + radius} ${x} ${routeLineY + radius} c ${x - curve} ${routeLineY + radius} ${x - radius} ${routeLineY + curve} ${x - radius} ${routeLineY} c ${x - radius} ${routeLineY - curve} ${x - curve} ${routeLineY - radius} ${x} ${routeLineY - radius} c f`);
+  };
+  endpoint(left + 40);
+  endpoint(right - 40);
+  commands.push(`1 1 1 RG 1.6 w ${routeMid - 14} ${routeLineY} m ${routeMid + 15} ${routeLineY} l S`);
+  commands.push(`0.89 0.78 0.43 RG 1.4 w ${routeMid + 4} ${routeLineY} m ${routeMid - 6} ${routeLineY + 8} l ${routeMid - 3} ${routeLineY} l ${routeMid - 6} ${routeLineY - 7} l ${routeMid + 4} ${routeLineY} l S`);
+  y -= 119;
+
+  const timing = sections.find(section => section.title === 'Flight timing')?.rows || [];
+  if (timing.length) {
+    ensureSpace(132);
+    sectionHeading('Flight timing');
+    const findTiming = label => timing.find(([candidate]) => candidate === label)?.[1] || 'Not entered';
+    const triplet = [['Pushback', findTiming('Pushback')], ['Taxi', findTiming('Taxi')], ['Flight time', findTiming('Flight time')]];
+    const tripletGap = 14;
+    const tripletWidth = (contentWidth - tripletGap * 2) / 3;
+    triplet.forEach(([label, value], index) => {
+      field(label, value, left + index * (tripletWidth + tripletGap), y, tripletWidth, { maxChars: 27, valueSize: 9 });
+    });
+    y -= 45;
+    const arrivals = [['Estimated arrival in Dublin', findTiming('Estimated arrival in Dublin')], ['Estimated local arrival', findTiming('Estimated local arrival')]];
+    const arrivalGap = 20;
+    const arrivalWidth = (contentWidth - arrivalGap) / 2;
+    arrivals.forEach(([label, value], index) => {
+      field(label, value, left + index * (arrivalWidth + arrivalGap), y, arrivalWidth, { maxChars: 44, valueSize: 10 });
+    });
+    y -= 42;
+  }
+
+  const passengerSection = sections.find(section => section.title === 'Passenger numbers');
+  if (passengerSection?.rows.length) {
+    ensureSpace(130);
+    sectionHeading('Passenger numbers');
+    const gap = 12;
+    const colWidth = (contentWidth - gap * 2) / 3;
+    passengerSection.rows.forEach(([label, value], index) => {
+      const col = index % 3;
+      const row = Math.floor(index / 3);
+      const x = left + col * (colWidth + gap);
+      const top = y - row * 38;
+      const isTotal = label === 'Total passengers including infants';
+      if (isTotal) {
+        rect(x - 6, top + 5, colWidth + 2, 34, '0.91 0.95 0.93');
+        commands.push(`0.08 0.17 0.23 RG 1 w ${x - 6} ${top - 29} ${colWidth + 2} 34 re S`);
+      }
+      field(label, value, x, top, colWidth, { maxChars: 24, valueSize: isTotal ? 14 : 11, color: isTotal ? '0.08 0.32 0.31' : '0.13 0.22 0.28' });
+    });
+    y -= Math.ceil(passengerSection.rows.length / 3) * 41 + 12;
+  }
+
+  const weatherSection = sections.find(section => section.title === 'Weather forecast');
+  if (weatherSection?.rows.length) {
+    ensureSpace(108);
+    sectionHeading('Weather forecast');
+    const gap = 12;
+    const colWidth = (contentWidth - gap) / 2;
+    const weatherCards = weatherSection.rows.map(([label, value], index) => {
+      const x = left + index * (colWidth + gap);
+      const lines = wrap(value, 48);
+      const cardHeight = 38 + lines.length * 12;
+      return { x, label, lines, cardHeight };
+    });
+    const cardHeight = Math.max(...weatherCards.map(card => card.cardHeight));
+    ensureSpace(cardHeight + 12);
+    weatherCards.forEach(card => {
+      rect(card.x, y, colWidth, cardHeight, '0.95 0.97 0.96');
+      text(card.label.toUpperCase(), card.x + 10, y - 12, 8, true, '0.09 0.42 0.40');
+      card.lines.forEach((line, index) => text(line, card.x + 10, y - 29 - index * 12, 8, index === 0));
+    });
+    y -= cardHeight + 17;
+  }
+
+  const notesSection = sections.find(section => section.title === 'Flight notes');
+  const notesValue = notesSection?.rows.find(([label]) => label === 'Notes')?.[1];
+  if (notesValue) {
+    if (y < 150) startPage();
+    sectionHeading('Flight notes');
+    const lines = wrap(notesValue, 94);
+    let lineIndex = 0;
+    while (lineIndex < lines.length) {
+      const availableLines = Math.max(1, Math.floor((y - 86) / 14));
+      const pageLines = lines.slice(lineIndex, lineIndex + availableLines);
+      const cardHeight = 24 + pageLines.length * 14;
+      rect(left, y, contentWidth, cardHeight, '0.96 0.97 0.95');
+      pageLines.forEach((line, index) => text(line, left + 12, y - 15 - index * 14, 10, false));
+      y -= cardHeight + 10;
+      lineIndex += pageLines.length;
+      if (lineIndex < lines.length) {
+        startPage();
+        sectionHeading('Flight notes (continued)');
+      }
+    }
+  }
+
+  pages.forEach((page, index) => {
+    page.push(`0.69 0.75 0.74 RG 0.6 w ${left} 47 m ${right} 47 l S`);
+    page.push(`0.36 0.43 0.44 rg BT /F1 8 Tf 1 0 0 1 ${left} 31 Tm (Generated from AerKit flight planning details) Tj ET`);
+    page.push(`0.36 0.43 0.44 rg BT /F1 8 Tf 1 0 0 1 ${right - 55} 31 Tm (Page ${index + 1} of ${pages.length}) Tj ET`);
+  });
+
+  const objects = [];
+  const addObject = value => { objects.push(value); return objects.length; };
+  const fontRegular = addObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
+  const fontBold = addObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
+  const pageIds = [];
+  pages.forEach(page => {
+    const stream = `${page.join('\n')}\n`;
+    const streamId = addObject(`<< /Length ${stream.length} >>\nstream\n${stream}endstream`);
+    pageIds.push(addObject(`<< /Type /Page /Parent 0 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Resources << /Font << /F1 ${fontRegular} 0 R /F2 ${fontBold} 0 R >> >> /Contents ${streamId} 0 R >>`));
+  });
+  const pagesId = addObject(`<< /Type /Pages /Kids [${pageIds.map(id => `${id} 0 R`).join(' ')}] /Count ${pageIds.length} >>`);
+  pageIds.forEach(id => { objects[id - 1] = objects[id - 1].replace('/Parent 0 0 R', `/Parent ${pagesId} 0 R`); });
+  const catalogId = addObject(`<< /Type /Catalog /Pages ${pagesId} 0 R >>`);
+  let pdf = '%PDF-1.4\n';
+  const offsets = [0];
+  objects.forEach((object, index) => { offsets.push(pdf.length); pdf += `${index + 1} 0 obj\n${object}\nendobj\n`; });
+  const xrefOffset = pdf.length;
+  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  offsets.slice(1).forEach(offset => { pdf += `${String(offset).padStart(10, '0')} 00000 n \n`; });
+  pdf += `trailer\n<< /Size ${objects.length + 1} /Root ${catalogId} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+  return new Blob([pdf], { type: 'application/pdf' });
+}
+
 function exportFlightInformation(form) {
   const values = Object.fromEntries(new FormData(form).entries());
-  const airport = code => getFlightAirport(code)?.name || 'Not selected';
-  const origin = airport(values.originAirport);
-  const destination = airport(values.destination);
-  const timeZone = destinationTimeZones[values.originAirport];
-  const pushbackDate = values.pushback && timeZone ? wallTimeToDate(values.pushback, timeZone) : null;
-  const pushback = pushbackDate && Number.isFinite(pushbackDate.getTime()) ? formatFlightTime(pushbackDate, timeZone) : 'Not entered';
-  const arrivalDublin = document.querySelector('#estimated-arrival-dublin')?.textContent || 'Not calculated';
-  const arrivalLocal = document.querySelector('#estimated-arrival-destination')?.textContent || 'Not calculated';
-  const generated = new Intl.DateTimeFormat('en-IE', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date());
-  const count = name => String(Math.max(0, Number(values[name]) || 0));
-  const prm = ['prmWhcr', 'prmWchs', 'prmWchsOther'].reduce((sum, name) => sum + Math.max(0, Number(values[name]) || 0), 0);
-  const row = (label, value) => `<div class="metric"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`;
+  const origin = getFlightAirport(values.originAirport);
+  const destination = getFlightAirport(values.destination);
+  const originZone = destinationTimeZones[values.originAirport];
+  const pushbackDate = values.pushback && originZone ? wallTimeToDate(values.pushback, originZone) : null;
+  const pushback = pushbackDate && Number.isFinite(pushbackDate.getTime())
+    ? formatFlightTime(pushbackDate, originZone) : 'Not entered';
+  const counts = name => String(Math.max(0, Number(values[name]) || 0));
+  const prmTotal = ['prmWhcr', 'prmWchs', 'prmWchsOther'].reduce((sum, name) => sum + Math.max(0, Number(values[name]) || 0), 0);
+  const paxTotal = ['business', 'premiumEconomy', 'economy', 'infants'].reduce((sum, name) => sum + Math.max(0, Number(values[name]) || 0), 0);
   const weather = role => {
-    const panel = document.querySelector(`#flight-weather-${role}`);
-    const details = Object.fromEntries([...(panel?.querySelectorAll('dt') || [])].map(term => [term.textContent.trim().toLowerCase(), term.nextElementSibling?.textContent.trim() || '']));
-    const forecast = panel?.querySelector('.weather-forecast-time')?.textContent.trim().replace(/^Forecast for /i, '') || 'Forecast unavailable';
-    return { forecast, temperature: details.temperature || 'Unavailable', wind: details.wind || 'Unavailable' };
+    const output = content.querySelector(`#flight-weather-${role}`);
+    const forecastTime = output.querySelector('.weather-forecast-time')?.textContent.trim() || '';
+    const details = Object.fromEntries([...output.querySelectorAll('dt')].map(term => [term.textContent.trim(), term.nextElementSibling?.textContent.trim() || '']));
+    const brief = [details.Temperature ? `Temperature ${details.Temperature}` : '', details.Wind ? `Wind ${details.Wind}` : '']
+      .filter(Boolean).join(' | ');
+    return [forecastTime, brief].filter(Boolean).join(' | ') || output.textContent.trim() || 'Forecast not available';
   };
-  const departureWeather = weather('origin');
-  const arrivalWeather = weather('destination');
-  const notes = values.flightInformation?.trim() || 'None';
-  const popup = window.open('', '_blank');
-  if (!popup) { alert('Allow pop-ups to create the Flight Information PDF.'); return; }
-  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Flight Information</title><style>
-    @page{size:A4;margin:14mm}*{box-sizing:border-box}body{margin:0;color:#172a35;font:12px/1.45 Arial,sans-serif}.header{background:#142b3b;color:#fff;padding:24px 28px 20px;position:relative}.header h1{font-size:28px;line-height:1.1;margin:0 0 15px}.generated{font-size:10px;color:#dbe2e3}.generated strong{display:block;color:#fff;font-size:12px;margin-top:2px}.body{padding:18px 0}.route{display:grid;grid-template-columns:1fr 1.6fr 1fr;align-items:center;gap:14px;padding:16px 18px;border:1px solid #d5ddde;border-radius:5px;background:#f4f6f3;margin-bottom:16px}.airport:last-child{text-align:right}.airport strong{display:block;font-size:22px;color:#142b3b}.airport span,.label{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#697b80;font-weight:bold}.route-line{height:28px;position:relative;display:flex;align-items:center;justify-content:center}.route-line:before{content:"";position:absolute;left:5px;right:5px;top:50%;border-top:2px solid #142b3b}.dot{position:absolute;top:50%;width:10px;height:10px;border:2px solid #142b3b;border-radius:50%;background:white;transform:translateY(-50%)}.dot.start{left:0}.dot.end{right:0}.plane{position:relative;background:#f4f6f3;padding:0 8px;font-size:20px;line-height:1}.section{margin:0 0 13px;break-inside:avoid}.section h2{font-size:15px;line-height:1.2;margin:0 0 11px;padding-bottom:7px;border-bottom:1px solid #aeb9ba;color:#142b3b}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.metrics.two{grid-template-columns:repeat(2,minmax(0,1fr))}.metric{padding:10px 11px;border:1px solid #d5ddde;border-radius:4px;min-height:54px}.metric span{display:block;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:#697b80;font-weight:bold;margin-bottom:4px}.metric strong{font-size:14px;overflow-wrap:anywhere}.passengers{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:10px}.passenger{padding:8px;border:1px solid #d5ddde;border-radius:4px}.passenger span{display:block;color:#697b80;font-size:9px;text-transform:uppercase;font-weight:bold}.passenger strong{font-size:15px}.total{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:2px solid #142b3b;border-radius:4px;font-weight:bold}.weather{display:grid;grid-template-columns:1fr 1fr;gap:10px}.weather-card{padding:10px;border:1px solid #d5ddde;border-radius:4px}.weather-card h3{font-size:13px;margin:0 0 6px}.weather-card p{margin:3px 0}.notes{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}.notes-section{break-inside:auto}.notes-section h2{break-after:avoid}.muted{color:#697b80}@media print{body{print-color-adjust:exact;-webkit-print-color-adjust:exact}.header{break-inside:avoid}.section{break-inside:avoid}.notes-section{break-inside:auto}}
-    </style></head><body><header class="header"><h1>Flight Information</h1><div class="generated">Date Report Generated<strong>${escapeHtml(generated)}</strong></div></header><main class="body">
-    <section class="route"><div class="airport"><span>Departure</span><strong>${escapeHtml(origin)}</strong><span>${escapeHtml(values.originAirport || '')}</span></div><div class="route-line"><i class="dot start"></i><span class="plane" aria-label="Aircraft">✈</span><i class="dot end"></i></div><div class="airport"><span>Arrival</span><strong>${escapeHtml(destination)}</strong><span>${escapeHtml(values.destination || '')}</span></div></section>
-    <section class="section"><h2>Flight Times</h2><div class="metrics">${row('Pushback', pushback)}${row('Taxi', values.taxiMinutes ? `${values.taxiMinutes} min` : 'Not entered')}${row('Flight Time', `${values.flightHours || '0'}h ${values.flightMinutes || '0'}m`)}</div></section>
-    <section class="section"><h2>Estimated Arrival</h2><div class="metrics two">${row('Estimated Arrival in Dublin', arrivalDublin)}${row(`Estimated Local Arrival · ${destination}`, arrivalLocal)}</div></section>
-    <section class="section"><h2>Passenger Breakdown</h2><div class="passengers">${[['Business',count('business')],['Premium Economy',count('premiumEconomy')],['Economy',count('economy')],['Infants',count('infants')],['PRM',String(prm)]].map(([label,value])=>`<div class="passenger"><span>${label}</span><strong>${value}</strong></div>`).join('')}</div><div class="total"><span>Total Passengers Including Infants</span><strong>${['business','premiumEconomy','economy','infants'].reduce((sum,name)=>sum+Math.max(0,Number(values[name])||0),0)}</strong></div></section>
-    <section class="section"><h2>Route Weather</h2><div class="weather">${[[`Departure · ${origin}`,departureWeather],[`Arrival · ${destination}`,arrivalWeather]].map(([label,w])=>`<article class="weather-card"><h3>${escapeHtml(label)}</h3><p class="muted">Forecast time: ${escapeHtml(w.forecast)}</p><p><b>Temperature:</b> ${escapeHtml(w.temperature)}</p><p><b>Wind:</b> ${escapeHtml(w.wind)}</p></article>`).join('')}</div></section>
-    <section class="section notes-section"><h2>Flight Notes</h2><div class="notes">${escapeHtml(notes)}</div></section></main><script>window.addEventListener('load',()=>setTimeout(()=>window.print(),250));</script></body></html>`;
-  popup.document.open(); popup.document.write(html); popup.document.close();
+  const sections = [
+    { title: 'Route', rows: [['Departure', origin ? `${origin.name} (${origin.code})` : 'Not selected'], ['Arrival', destination ? `${destination.name} (${destination.code})` : 'Not selected']] },
+    { title: 'Flight timing', rows: [
+      ['Pushback', pushback], ['Taxi', values.taxiMinutes ? `${values.taxiMinutes} minutes` : 'Not entered'],
+      ['Flight time', `${values.flightHours || '0'} hours ${values.flightMinutes || '0'} minutes`],
+      ['Estimated arrival in Dublin', content.querySelector('#estimated-arrival-dublin').textContent],
+      ['Estimated local arrival', content.querySelector('#estimated-arrival-destination').textContent]
+    ] },
+    { title: 'Passenger numbers', rows: [
+      ['Business class', counts('business')], ['Premium Economy', counts('premiumEconomy')], ['Economy', counts('economy')],
+      ['Infants', counts('infants')], ['WHCR', counts('prmWhcr')], ['WCHS', counts('prmWchs')],
+      ['WCHC', counts('prmWchsOther')], ['PRM total', String(prmTotal)], ['Total passengers including infants', String(paxTotal)]
+    ] },
+    { title: 'Weather forecast', rows: [
+      [`Departure${origin ? ` - ${origin.name}` : ''}`, weather('origin')],
+      [`Arrival${destination ? ` - ${destination.name}` : ''}`, weather('destination')]
+    ] },
+    { title: 'Flight notes', rows: [['Notes', values.flightInformation?.trim() || 'None']] }
+  ];
+  const blob = buildFlightInformationPdf(sections);
+  const link = document.createElement('a');
+  const route = [origin?.code, destination?.code].filter(Boolean).join('-') || 'flight-plan';
+  const date = new Date().toISOString().slice(0, 10);
+  link.href = URL.createObjectURL(blob);
+  link.download = `AerKit-Flight-Information-${route}-${date}.pdf`;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
 }
 
 function formatFlightTime(date, timeZone) {
