@@ -6,80 +6,82 @@ endobj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
 endobj
 3 0 obj
-<< /Length 5871 >>
+<< /Length 6544 >>
 stream
 1 1 1 rg 0 0 595 842 re f
 0.08 0.17 0.23 rg 0 766 595 76 re f
 1 1 1 rg BT /F2 22 Tf 1 0 0 1 48 798 Tm (Flight Information) Tj ET
 0.89 0.78 0.43 rg BT /F2 7 Tf 1 0 0 1 390 808 Tm (Date Report Generated) Tj ET
-0.88 0.91 0.90 rg BT /F1 8 Tf 1 0 0 1 390 793 Tm (27 Nov 2026, 18:41) Tj ET
-0.08 0.17 0.23 rg 48 646 499 102 re f
-0.89 0.78 0.43 rg BT /F2 8 Tf 1 0 0 1 64 725 Tm (PLANNED ROUTE) Tj ET
-0.89 0.78 0.43 rg BT /F2 7 Tf 1 0 0 1 64 708 Tm (DEPARTURE) Tj ET
+0.88 0.91 0.90 rg BT /F1 8 Tf 1 0 0 1 390 793 Tm (27 Nov 2026, 20:22) Tj ET
+0.08 0.17 0.23 rg 48 666 499 82 re f
+0.89 0.78 0.43 rg BT /F2 7 Tf 1 0 0 1 64 711 Tm (DEPARTURE) Tj ET
 1 1 1 rg BT /F2 14 Tf 1 0 0 1 64 688 Tm (Dublin \(DUB\)) Tj ET
-0.89 0.78 0.43 rg BT /F2 7 Tf 1 0 0 1 315.5 708 Tm (ARRIVAL) Tj ET
-1 1 1 rg BT /F2 14 Tf 1 0 0 1 315.5 688 Tm (Boston \(BOS\)) Tj ET
-0.89 0.78 0.43 RG 1.2 w 88 669 m 507 669 l S
-0.89 0.78 0.43 rg 88 666 m 89.6569 666 91 667.3431 91 669 c 91 670.6569 89.6569 672 88 672 c 86.3431 672 85 670.6569 85 669 c 85 667.3431 86.3431 666 88 666 c f
-0.89 0.78 0.43 rg 507 666 m 508.6569 666 510 667.3431 510 669 c 510 670.6569 508.6569 672 507 672 c 505.3431 672 504 670.6569 504 669 c 504 667.3431 505.3431 666 507 666 c f
-1 1 1 RG 1.6 w 283.5 669 m 312.5 669 l S
-0.89 0.78 0.43 RG 1.4 w 301.5 669 m 291.5 677 l 294.5 669 l 291.5 662 l 301.5 669 l S
-0.09 0.42 0.40 rg BT /F2 9 Tf 1 0 0 1 48 620 Tm (FLIGHT TIMING) Tj ET
-0.09 0.42 0.40 RG 0.7 w 48 615 m 547 615 l S
-0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 48 596 Tm (PUSHBACK) Tj ET
-0.13 0.22 0.28 rg BT /F2 9 Tf 1 0 0 1 48 581 Tm (10:15 \(GMT\) | 27 Nov) Tj ET
-0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 219 596 Tm (TAXI) Tj ET
-0.13 0.22 0.28 rg BT /F2 9 Tf 1 0 0 1 219 581 Tm (20 minutes) Tj ET
-0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 390 596 Tm (FLIGHT TIME) Tj ET
-0.13 0.22 0.28 rg BT /F2 9 Tf 1 0 0 1 390 581 Tm (7 hours 15 minutes) Tj ET
-0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 48 551 Tm (ESTIMATED ARRIVAL IN DUBLIN) Tj ET
-0.13 0.22 0.28 rg BT /F2 10 Tf 1 0 0 1 48 535 Tm (17:50 \(GMT\) | 27 Nov) Tj ET
-0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 307.5 551 Tm (ESTIMATED LOCAL ARRIVAL) Tj ET
-0.13 0.22 0.28 rg BT /F2 10 Tf 1 0 0 1 307.5 535 Tm (12:50 \(EST\) | 27 Nov) Tj ET
-0.09 0.42 0.40 rg BT /F2 9 Tf 1 0 0 1 48 507 Tm (PASSENGER NUMBERS) Tj ET
-0.09 0.42 0.40 RG 0.7 w 48 502 m 547 502 l S
-0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 48 483 Tm (BUSINESS CLASS) Tj ET
-0.13 0.22 0.28 rg BT /F2 11 Tf 1 0 0 1 48 466 Tm (28) Tj ET
-0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 218.33333333333334 483 Tm (PREMIUM ECONOMY) Tj ET
-0.13 0.22 0.28 rg BT /F2 11 Tf 1 0 0 1 218.33333333333334 466 Tm (24) Tj ET
-0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 388.6666666666667 483 Tm (ECONOMY) Tj ET
-0.13 0.22 0.28 rg BT /F2 11 Tf 1 0 0 1 388.6666666666667 466 Tm (187) Tj ET
-0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 48 445 Tm (INFANTS) Tj ET
-0.13 0.22 0.28 rg BT /F2 11 Tf 1 0 0 1 48 428 Tm (3) Tj ET
-0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 218.33333333333334 445 Tm (WHCR) Tj ET
-0.13 0.22 0.28 rg BT /F2 11 Tf 1 0 0 1 218.33333333333334 428 Tm (2) Tj ET
-0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 388.6666666666667 445 Tm (WCHS) Tj ET
-0.13 0.22 0.28 rg BT /F2 11 Tf 1 0 0 1 388.6666666666667 428 Tm (1) Tj ET
-0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 48 407 Tm (WCHC) Tj ET
-0.13 0.22 0.28 rg BT /F2 11 Tf 1 0 0 1 48 390 Tm (1) Tj ET
-0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 218.33333333333334 407 Tm (PRM TOTAL) Tj ET
-0.13 0.22 0.28 rg BT /F2 11 Tf 1 0 0 1 218.33333333333334 390 Tm (4) Tj ET
-0.91 0.95 0.93 rg 382.6666666666667 385 160.33333333333334 34 re f
-0.08 0.17 0.23 RG 1 w 382.6666666666667 385 160.33333333333334 34 re S
-0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 388.6666666666667 407 Tm (TOTAL PASSENGERS INCLUDING INFANTS) Tj ET
-0.08 0.32 0.31 rg BT /F2 14 Tf 1 0 0 1 388.6666666666667 387 Tm (242) Tj ET
-0.09 0.42 0.40 rg BT /F2 9 Tf 1 0 0 1 48 346 Tm (WEATHER FORECAST) Tj ET
-0.09 0.42 0.40 RG 0.7 w 48 341 m 547 341 l S
-0.95 0.97 0.96 rg 48 267 243.5 62 re f
-0.09 0.42 0.40 rg BT /F2 8 Tf 1 0 0 1 58 309 Tm (DEPARTURE - DUBLIN) Tj ET
-0.13 0.22 0.28 rg BT /F2 8 Tf 1 0 0 1 58 292 Tm (Forecast for 10:00 local time | Temperature 8) Tj ET
-0.13 0.22 0.28 rg BT /F1 8 Tf 1 0 0 1 58 280 Tm (deg C | Wind 16 km/h) Tj ET
-0.95 0.97 0.96 rg 303.5 267 243.5 62 re f
-0.09 0.42 0.40 rg BT /F2 8 Tf 1 0 0 1 313.5 309 Tm (ARRIVAL - BOSTON) Tj ET
-0.13 0.22 0.28 rg BT /F2 8 Tf 1 0 0 1 313.5 292 Tm (Forecast for 13:00 local time | Temperature 4) Tj ET
-0.13 0.22 0.28 rg BT /F1 8 Tf 1 0 0 1 313.5 280 Tm (deg C | Wind 22 km/h) Tj ET
-0.09 0.42 0.40 rg BT /F2 9 Tf 1 0 0 1 48 241 Tm (FLIGHT NOTES) Tj ET
-0.09 0.42 0.40 RG 0.7 w 48 236 m 547 236 l S
-0.96 0.97 0.95 rg 48 74 499 150 re f
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 199 Tm (Sector note 1: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 185 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 171 Tm (Sector note 2: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 157 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 143 Tm (Sector note 3: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 129 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 115 Tm (Sector note 4: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 101 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 87 Tm (Sector note 5: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.89 0.78 0.43 rg BT /F2 7 Tf 1 0 0 1 502.09 711 Tm (ARRIVAL) Tj ET
+1 1 1 rg BT /F2 14 Tf 1 0 0 1 439.15999999999997 688 Tm (Boston \(BOS\)) Tj ET
+0.89 0.78 0.43 RG 1.2 w 166.12 695 m 422.15999999999997 695 l S
+0.89 0.78 0.43 rg 166.12 692 m 167.7769 692 169.12 693.3431 169.12 695 c 169.12 696.6569 167.7769 698 166.12 698 c 164.4631 698 163.12 696.6569 163.12 695 c 163.12 693.3431 164.4631 692 166.12 692 c f
+0.89 0.78 0.43 rg 422.15999999999997 692 m 423.8169 692 425.15999999999997 693.3431 425.15999999999997 695 c 425.15999999999997 696.6569 423.8169 698 422.15999999999997 698 c 420.50309999999996 698 419.15999999999997 696.6569 419.15999999999997 695 c 419.15999999999997 693.3431 420.50309999999996 692 422.15999999999997 692 c f
+0.08 0.17 0.23 rg 274.14 684 40 22 re f
+0.89 0.78 0.43 rg 309.14 696 m 309.14 697 305.14 697.5 301.14 697.5 c 296.14 697.5 l 292.14 704 l 289.14 704 l 292.14 697.5 l 281.14 697.5 l 278.14 700 l 276.14 700 l 278.14 695.8 l 278.14 694.2 l 276.14 690 l 278.14 690 l 281.14 692.5 l 292.14 692.5 l 289.14 686 l 292.14 686 l 296.14 692.5 l 301.14 692.5 l 305.14 692.5 309.14 693 309.14 694 c 309.14 696 l h f
+0.09 0.42 0.40 rg BT /F2 9 Tf 1 0 0 1 48 640 Tm (FLIGHT TIMING) Tj ET
+0.09 0.42 0.40 RG 0.7 w 48 635 m 547 635 l S
+0.40 0.49 0.49 rg BT /F2 8 Tf 1 0 0 1 48 615 Tm (PUSHBACK) Tj ET
+0.13 0.22 0.28 rg BT /F2 10.5 Tf 1 0 0 1 48 599.5 Tm (10:15 \(GMT\) | 27 Nov) Tj ET
+0.40 0.49 0.49 rg BT /F2 8 Tf 1 0 0 1 219 615 Tm (TAXI) Tj ET
+0.13 0.22 0.28 rg BT /F2 10.5 Tf 1 0 0 1 219 599.5 Tm (20 minutes) Tj ET
+0.40 0.49 0.49 rg BT /F2 8 Tf 1 0 0 1 390 615 Tm (FLIGHT TIME) Tj ET
+0.13 0.22 0.28 rg BT /F2 10.5 Tf 1 0 0 1 390 599.5 Tm (7 hours 15 minutes) Tj ET
+0.40 0.49 0.49 rg BT /F2 8 Tf 1 0 0 1 48 570 Tm (ESTIMATED ARRIVAL IN DUBLIN) Tj ET
+0.13 0.22 0.28 rg BT /F2 10.5 Tf 1 0 0 1 48 554.5 Tm (17:50 \(GMT\) | 27 Nov) Tj ET
+0.40 0.49 0.49 rg BT /F2 8 Tf 1 0 0 1 307.5 570 Tm (ESTIMATED LOCAL ARRIVAL) Tj ET
+0.13 0.22 0.28 rg BT /F2 10.5 Tf 1 0 0 1 307.5 554.5 Tm (12:50 \(EST\) | 27 Nov) Tj ET
+0.09 0.42 0.40 rg BT /F2 9 Tf 1 0 0 1 48 527 Tm (PASSENGER NUMBERS) Tj ET
+0.09 0.42 0.40 RG 0.7 w 48 522 m 547 522 l S
+0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 48 503 Tm (BUSINESS CLASS) Tj ET
+0.13 0.22 0.28 rg BT /F2 11 Tf 1 0 0 1 48 486 Tm (28) Tj ET
+0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 218.33333333333334 503 Tm (PREMIUM ECONOMY) Tj ET
+0.13 0.22 0.28 rg BT /F2 11 Tf 1 0 0 1 218.33333333333334 486 Tm (24) Tj ET
+0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 388.6666666666667 503 Tm (ECONOMY) Tj ET
+0.13 0.22 0.28 rg BT /F2 11 Tf 1 0 0 1 388.6666666666667 486 Tm (187) Tj ET
+0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 48 465 Tm (INFANTS) Tj ET
+0.13 0.22 0.28 rg BT /F2 11 Tf 1 0 0 1 48 448 Tm (3) Tj ET
+0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 218.33333333333334 465 Tm (WHCR) Tj ET
+0.13 0.22 0.28 rg BT /F2 11 Tf 1 0 0 1 218.33333333333334 448 Tm (2) Tj ET
+0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 388.6666666666667 465 Tm (WCHS) Tj ET
+0.13 0.22 0.28 rg BT /F2 11 Tf 1 0 0 1 388.6666666666667 448 Tm (1) Tj ET
+0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 48 427 Tm (WCHC) Tj ET
+0.13 0.22 0.28 rg BT /F2 11 Tf 1 0 0 1 48 410 Tm (1) Tj ET
+0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 218.33333333333334 427 Tm (PRM TOTAL) Tj ET
+0.13 0.22 0.28 rg BT /F2 11 Tf 1 0 0 1 218.33333333333334 410 Tm (4) Tj ET
+0.91 0.95 0.93 rg 382.6666666666667 405 160.33333333333334 34 re f
+0.08 0.17 0.23 RG 1 w 382.6666666666667 405 160.33333333333334 34 re S
+0.40 0.49 0.49 rg BT /F2 7 Tf 1 0 0 1 388.6666666666667 427 Tm (TOTAL PASSENGERS INCLUDING INFANTS) Tj ET
+0.08 0.32 0.31 rg BT /F2 14 Tf 1 0 0 1 388.6666666666667 407 Tm (242) Tj ET
+0.09 0.42 0.40 rg BT /F2 9 Tf 1 0 0 1 48 366 Tm (WEATHER FORECAST) Tj ET
+0.09 0.42 0.40 RG 0.7 w 48 361 m 547 361 l S
+0.95 0.97 0.96 rg 48 275 243.5 74 re f
+0.09 0.42 0.40 rg BT /F2 8 Tf 1 0 0 1 58 329 Tm (DEPARTURE - DUBLIN) Tj ET
+0.13 0.22 0.28 rg BT /F2 8 Tf 1 0 0 1 58 312 Tm (Forecast for 10:00 local time) Tj ET
+0.13 0.22 0.28 rg BT /F1 8 Tf 1 0 0 1 58 300 Tm (Temperature 8 deg C) Tj ET
+0.13 0.22 0.28 rg BT /F1 8 Tf 1 0 0 1 58 288 Tm (Wind 16 km/h) Tj ET
+0.95 0.97 0.96 rg 303.5 275 243.5 74 re f
+0.09 0.42 0.40 rg BT /F2 8 Tf 1 0 0 1 313.5 329 Tm (ARRIVAL - BOSTON) Tj ET
+0.13 0.22 0.28 rg BT /F2 8 Tf 1 0 0 1 313.5 312 Tm (Forecast for 13:00 local time) Tj ET
+0.13 0.22 0.28 rg BT /F1 8 Tf 1 0 0 1 313.5 300 Tm (Temperature 4 deg C) Tj ET
+0.13 0.22 0.28 rg BT /F1 8 Tf 1 0 0 1 313.5 288 Tm (Wind 22 km/h) Tj ET
+0.09 0.42 0.40 rg BT /F2 9 Tf 1 0 0 1 48 249 Tm (FLIGHT NOTES) Tj ET
+0.09 0.42 0.40 RG 0.7 w 48 244 m 547 244 l S
+0.96 0.97 0.95 rg 48 68 499 164 re f
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 207 Tm (Sector note 1: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 193 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 179 Tm (Sector note 2: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 165 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 151 Tm (Sector note 3: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 137 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 123 Tm (Sector note 4: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 109 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 95 Tm (Sector note 5: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 81 Tm (timing, and operational updates from the flight deck.) Tj ET
 0.69 0.75 0.74 RG 0.6 w 48 47 m 547 47 l S
 0.36 0.43 0.44 rg BT /F1 8 Tf 1 0 0 1 48 31 Tm (Generated from AerKit flight planning details) Tj ET
 0.36 0.43 0.44 rg BT /F1 8 Tf 1 0 0 1 492 31 Tm (Page 1 of 2) Tj ET
@@ -89,59 +91,58 @@ endobj
 << /Type /Page /Parent 7 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 3 0 R >>
 endobj
 5 0 obj
-<< /Length 6207 >>
+<< /Length 6097 >>
 stream
 1 1 1 rg 0 0 595 842 re f
 0.08 0.17 0.23 rg 0 766 595 76 re f
 1 1 1 rg BT /F2 22 Tf 1 0 0 1 48 798 Tm (Flight Information) Tj ET
 0.89 0.78 0.43 rg BT /F2 7 Tf 1 0 0 1 390 808 Tm (Date Report Generated) Tj ET
-0.88 0.91 0.90 rg BT /F1 8 Tf 1 0 0 1 390 793 Tm (27 Nov 2026, 18:41) Tj ET
+0.88 0.91 0.90 rg BT /F1 8 Tf 1 0 0 1 390 793 Tm (27 Nov 2026, 20:22) Tj ET
 0.09 0.42 0.40 rg BT /F2 9 Tf 1 0 0 1 48 739 Tm (FLIGHT NOTES \(CONTINUED\)) Tj ET
 0.09 0.42 0.40 RG 0.7 w 48 734 m 547 734 l S
-0.96 0.97 0.95 rg 48 96 499 626 re f
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 697 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 683 Tm (Sector note 6: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 669 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 655 Tm (Sector note 7: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 641 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 627 Tm (Sector note 8: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 613 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 599 Tm (Sector note 9: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 585 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 571 Tm (Sector note 10: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 557 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 543 Tm (Sector note 11: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 529 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 515 Tm (Sector note 12: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 501 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 487 Tm (Sector note 13: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 473 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 459 Tm (Sector note 14: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 445 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 431 Tm (Sector note 15: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 417 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 403 Tm (Sector note 16: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 389 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 375 Tm (Sector note 17: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 361 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 347 Tm (Sector note 18: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 333 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 319 Tm (Sector note 19: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 305 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 291 Tm (Sector note 20: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 277 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 263 Tm (Sector note 21: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 249 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 235 Tm (Sector note 22: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 221 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 207 Tm (Sector note 23: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 193 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 179 Tm (Sector note 24: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 165 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 151 Tm (Sector note 25: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 137 Tm (timing, and operational updates from the flight deck.) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 123 Tm (Sector note 26: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
-0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 109 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.96 0.97 0.95 rg 48 110 499 612 re f
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 697 Tm (Sector note 6: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 683 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 669 Tm (Sector note 7: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 655 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 641 Tm (Sector note 8: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 627 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 613 Tm (Sector note 9: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 599 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 585 Tm (Sector note 10: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 571 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 557 Tm (Sector note 11: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 543 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 529 Tm (Sector note 12: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 515 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 501 Tm (Sector note 13: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 487 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 473 Tm (Sector note 14: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 459 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 445 Tm (Sector note 15: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 431 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 417 Tm (Sector note 16: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 403 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 389 Tm (Sector note 17: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 375 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 361 Tm (Sector note 18: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 347 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 333 Tm (Sector note 19: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 319 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 305 Tm (Sector note 20: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 291 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 277 Tm (Sector note 21: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 263 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 249 Tm (Sector note 22: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 235 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 221 Tm (Sector note 23: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 207 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 193 Tm (Sector note 24: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 179 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 165 Tm (Sector note 25: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 151 Tm (timing, and operational updates from the flight deck.) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 137 Tm (Sector note 26: cabin briefing complete; monitor turbulence, passenger assistance, service) Tj ET
+0.13 0.22 0.28 rg BT /F1 10 Tf 1 0 0 1 60 123 Tm (timing, and operational updates from the flight deck.) Tj ET
 0.69 0.75 0.74 RG 0.6 w 48 47 m 547 47 l S
 0.36 0.43 0.44 rg BT /F1 8 Tf 1 0 0 1 48 31 Tm (Generated from AerKit flight planning details) Tj ET
 0.36 0.43 0.44 rg BT /F1 8 Tf 1 0 0 1 492 31 Tm (Page 2 of 2) Tj ET
@@ -162,13 +163,13 @@ xref
 0000000009 00000 n 
 0000000106 00000 n 
 0000000208 00000 n 
-0000006130 00000 n 
-0000006266 00000 n 
-0000012524 00000 n 
-0000012660 00000 n 
-0000012723 00000 n 
+0000006803 00000 n 
+0000006939 00000 n 
+0000013087 00000 n 
+0000013223 00000 n 
+0000013286 00000 n 
 trailer
 << /Size 9 /Root 8 0 R >>
 startxref
-12772
+13335
 %%EOF

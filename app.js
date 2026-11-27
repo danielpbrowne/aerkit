@@ -1149,6 +1149,10 @@ function buildFlightInformationPdf(sections) {
   const text = (value, x, top, size = 10, bold = false, color = '0.13 0.22 0.28') => {
     commands.push(`${color} rg BT /${bold ? 'F2' : 'F1'} ${size} Tf 1 0 0 1 ${x} ${top - size} Tm (${escapePdf(value)}) Tj ET`);
   };
+  const textWidth = (value, size) => [...flightPdfText(value)].reduce((width, char) => {
+    const factor = 'ilI1.,:;| '.includes(char) ? 0.29 : 'MW@'.includes(char) ? 0.85 : /[A-Z]/.test(char) ? 0.64 : 0.53;
+    return width + factor * size;
+  }, 0);
   const rect = (x, top, width, height, color) => commands.push(`${color} rg ${x} ${top - height} ${width} ${height} re f`);
   const startPage = () => {
     commands = ['1 1 1 rg 0 0 595 842 re f', '0.08 0.17 0.23 rg 0 766 595 76 re f'];
@@ -1182,8 +1186,8 @@ function buildFlightInformationPdf(sections) {
     y -= 26;
   };
   const field = (label, value, x, top, width, options = {}) => {
-    const { valueSize = 11, maxChars = Math.max(16, Math.floor(width / (valueSize * 0.53))), color = '0.13 0.22 0.28', labelColor = '0.40 0.49 0.49' } = options;
-    text(label.toUpperCase(), x, top, 7, true, labelColor);
+    const { valueSize = 11, labelSize = 7, maxChars = Math.max(16, Math.floor(width / (valueSize * 0.53))), color = '0.13 0.22 0.28', labelColor = '0.40 0.49 0.49' } = options;
+    text(label.toUpperCase(), x, top, labelSize, true, labelColor);
     const lines = wrap(value, maxChars);
     lines.forEach((line, index) => text(line, x, top - 13 - (index * 13), valueSize, index === 0, color));
     return 26 + Math.max(0, lines.length - 1) * 13;
@@ -1193,24 +1197,36 @@ function buildFlightInformationPdf(sections) {
   const route = sections.find(section => section.title === 'Route')?.rows || [];
   const routeOrigin = route.find(([label]) => label === 'Departure')?.[1] || 'Not selected';
   const routeDestination = route.find(([label]) => label === 'Arrival')?.[1] || 'Not selected';
-  ensureSpace(114);
-  rect(left, y, contentWidth, 102, '0.08 0.17 0.23');
-  text('PLANNED ROUTE', left + 16, y - 15, 8, true, '0.89 0.78 0.43');
-  const routeMid = left + contentWidth / 2;
-  field('Departure', routeOrigin, left + 16, y - 33, contentWidth / 2 - 28, { valueSize: 14, maxChars: 24, color: '1 1 1', labelColor: '0.89 0.78 0.43' });
-  field('Arrival', routeDestination, routeMid + 18, y - 33, contentWidth / 2 - 34, { valueSize: 14, maxChars: 24, color: '1 1 1', labelColor: '0.89 0.78 0.43' });
-  const routeLineY = y - 79;
-  commands.push(`0.89 0.78 0.43 RG 1.2 w ${left + 40} ${routeLineY} m ${right - 40} ${routeLineY} l S`);
+  ensureSpace(94);
+  rect(left, y, contentWidth, 82, '0.08 0.17 0.23');
+  const originX = left + 16;
+  const arrivalRight = right - 16;
+  text('DEPARTURE', originX, y - 30, 7, true, '0.89 0.78 0.43');
+  text(routeOrigin, originX, y - 46, 14, true, '1 1 1');
+  text('ARRIVAL', arrivalRight - textWidth('ARRIVAL', 7), y - 30, 7, true, '0.89 0.78 0.43');
+  text(routeDestination, arrivalRight - textWidth(routeDestination, 14), y - 46, 14, true, '1 1 1');
+  const routeStart = originX + textWidth(routeOrigin, 14) + 17;
+  const routeEnd = arrivalRight - textWidth(routeDestination, 14) - 17;
+  const routeMid = (routeStart + routeEnd) / 2;
+  const routeLineY = y - 53;
+  commands.push(`0.89 0.78 0.43 RG 1.2 w ${routeStart} ${routeLineY} m ${routeEnd} ${routeLineY} l S`);
   const endpoint = x => {
     const radius = 3;
     const curve = radius * 0.5523;
     commands.push(`0.89 0.78 0.43 rg ${x} ${routeLineY - radius} m ${x + curve} ${routeLineY - radius} ${x + radius} ${routeLineY - curve} ${x + radius} ${routeLineY} c ${x + radius} ${routeLineY + curve} ${x + curve} ${routeLineY + radius} ${x} ${routeLineY + radius} c ${x - curve} ${routeLineY + radius} ${x - radius} ${routeLineY + curve} ${x - radius} ${routeLineY} c ${x - radius} ${routeLineY - curve} ${x - curve} ${routeLineY - radius} ${x} ${routeLineY - radius} c f`);
   };
-  endpoint(left + 40);
-  endpoint(right - 40);
-  commands.push(`1 1 1 RG 1.6 w ${routeMid - 14} ${routeLineY} m ${routeMid + 15} ${routeLineY} l S`);
-  commands.push(`0.89 0.78 0.43 RG 1.4 w ${routeMid + 4} ${routeLineY} m ${routeMid - 6} ${routeLineY + 8} l ${routeMid - 3} ${routeLineY} l ${routeMid - 6} ${routeLineY - 7} l ${routeMid + 4} ${routeLineY} l S`);
-  y -= 119;
+  endpoint(routeStart);
+  endpoint(routeEnd);
+  rect(routeMid - 20, routeLineY + 11, 40, 22, '0.08 0.17 0.23');
+  const aircraftOutline = [
+    [2, 2.5], [-2, 9], [-5, 9], [-2, 2.5], [-13, 2.5],
+    [-16, 5], [-18, 5], [-16, 0.8], [-16, -0.8], [-18, -5],
+    [-16, -5], [-13, -2.5], [-2, -2.5], [-5, -9], [-2, -9],
+    [2, -2.5], [7, -2.5]
+  ];
+  const aircraftPoint = (dx, dy) => `${routeMid + dx} ${routeLineY + dy}`;
+  commands.push(`0.89 0.78 0.43 rg ${aircraftPoint(15, 1)} m ${aircraftPoint(15, 2)} ${aircraftPoint(11, 2.5)} ${aircraftPoint(7, 2.5)} c ${aircraftOutline.map(([dx, dy]) => `${aircraftPoint(dx, dy)} l`).join(' ')} ${aircraftPoint(11, -2.5)} ${aircraftPoint(15, -2)} ${aircraftPoint(15, -1)} c ${aircraftPoint(15, 1)} l h f`);
+  y -= 99;
 
   const timing = sections.find(section => section.title === 'Flight timing')?.rows || [];
   if (timing.length) {
@@ -1221,14 +1237,14 @@ function buildFlightInformationPdf(sections) {
     const tripletGap = 14;
     const tripletWidth = (contentWidth - tripletGap * 2) / 3;
     triplet.forEach(([label, value], index) => {
-      field(label, value, left + index * (tripletWidth + tripletGap), y, tripletWidth, { maxChars: 27, valueSize: 9 });
+      field(label, value, left + index * (tripletWidth + tripletGap), y, tripletWidth, { maxChars: 27, labelSize: 8, valueSize: 10.5 });
     });
     y -= 45;
     const arrivals = [['Estimated arrival in Dublin', findTiming('Estimated arrival in Dublin')], ['Estimated local arrival', findTiming('Estimated local arrival')]];
     const arrivalGap = 20;
     const arrivalWidth = (contentWidth - arrivalGap) / 2;
     arrivals.forEach(([label, value], index) => {
-      field(label, value, left + index * (arrivalWidth + arrivalGap), y, arrivalWidth, { maxChars: 44, valueSize: 10 });
+      field(label, value, left + index * (arrivalWidth + arrivalGap), y, arrivalWidth, { maxChars: 44, labelSize: 8, valueSize: 10.5 });
     });
     y -= 42;
   }
@@ -1342,9 +1358,8 @@ function exportFlightInformation(form) {
     const output = content.querySelector(`#flight-weather-${role}`);
     const forecastTime = output.querySelector('.weather-forecast-time')?.textContent.trim() || '';
     const details = Object.fromEntries([...output.querySelectorAll('dt')].map(term => [term.textContent.trim(), term.nextElementSibling?.textContent.trim() || '']));
-    const brief = [details.Temperature ? `Temperature ${details.Temperature}` : '', details.Wind ? `Wind ${details.Wind}` : '']
-      .filter(Boolean).join(' | ');
-    return [forecastTime, brief].filter(Boolean).join(' | ') || output.textContent.trim() || 'Forecast not available';
+    return [forecastTime, details.Temperature ? `Temperature ${details.Temperature}` : '', details.Wind ? `Wind ${details.Wind}` : '']
+      .filter(Boolean).join('\n') || output.textContent.trim() || 'Forecast not available';
   };
   const sections = [
     { title: 'Route', rows: [['Departure', origin ? `${origin.name} (${origin.code})` : 'Not selected'], ['Arrival', destination ? `${destination.name} (${destination.code})` : 'Not selected']] },
