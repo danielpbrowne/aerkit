@@ -95,7 +95,7 @@ main{max-width:1120px;margin:auto;padding:0 30px}
 .destination-tools input:focus,.destination-tools select:focus{outline:2px solid #8ea39b;outline-offset:1px}
 .destination-result-count{margin:8px 1px 10px;color:var(--muted);font:12px ui-monospace,SFMono-Regular,monospace}
 .destination-list{grid-template-columns:repeat(3,minmax(0,1fr))}
-.destination{display:flex;min-width:0;min-height:112px;flex-direction:column;align-items:stretch;justify-content:center;gap:15px;padding:17px 16px}
+.destination{display:flex;min-width:0;min-height:112px;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:15px;padding:17px 16px}
 .destination-main,.destination-details{display:flex;min-width:0;align-items:center;justify-content:space-between;gap:8px}.destination-details{padding-top:11px;border-top:1px solid var(--line)}
 .destination-main strong{overflow:hidden;color:var(--navy-deep);font:600 18px/1.15 Outfit,Urbanist,sans-serif;text-overflow:ellipsis;white-space:nowrap}
 .destination .destination-code{flex:none;color:#8d773d;font:600 18px/1.15 ui-monospace,SFMono-Regular,monospace;letter-spacing:.05em}
@@ -105,6 +105,7 @@ main{max-width:1120px;margin:auto;padding:0 30px}
 .destination-empty{grid-column:1/-1;display:flex;flex-direction:column;gap:3px;padding:22px;border:1px dashed var(--line);border-radius:6px;color:var(--muted);font-size:14px}
 .destination-empty strong{color:var(--ink);font-size:16px}
 @media(max-width:760px){.destination-tools{grid-template-columns:1fr 1fr}.destination-search{grid-column:1/-1}.destination-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:601px) and (max-width:900px){.destination-details{align-items:flex-start;flex-direction:column;gap:8px}.destination-details>span:first-child{max-width:100%}}
 @media(max-width:600px){.destination-tools{gap:8px;margin-top:13px;padding:11px}.destination-tools input,.destination-tools select{min-height:42px;font-size:14px}.destination{min-height:120px;padding:14px 10px;gap:14px}.destination-main strong,.destination .destination-code{font-size:16px}.destination-details{align-items:flex-start;flex-direction:column;gap:9px}.destination-details>span:first-child{max-width:100%}}
 .empty{background:var(--paper);border:1px dashed #c3cdd0;border-radius:6px;padding:26px;color:var(--muted);font-size:16px}
 .empty strong{color:var(--ink);display:block;margin-bottom:5px}
