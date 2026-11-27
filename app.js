@@ -1,4 +1,5 @@
 const data = window.CSM_DATA;
+const FEEDBACK_WHATSAPP_NUMBER = '353868277384';
 const sections = {
   essentials: { title: 'Quick Access', desc: 'Quick access to the most frequently visited tools.' },
   destinations: { title: 'Where We Fly', desc: 'Tap a location to view Airport, Hotel & Transport Information.' },
@@ -158,13 +159,11 @@ function renderFeedbackPage() {
     .join('');
   content.innerHTML = heading('FEEDBACK', sections.feedback.title, sections.feedback.desc)
     + `<article class="card feedback-card">
-      <p>Choose what your feedback relates to, then describe the information that should be added or corrected.</p>
       <form id="feedback-form" class="feedback-form">
         <label class="flight-field"><span>Feedback type</span><select id="feedback-category" required><option value="">Select a category</option><option>Airport Information</option><option>Outstation Contact Information</option><option>Hotel Information</option><option>Other</option><option>App Idea Suggestions</option></select></label>
         <label class="flight-field" id="feedback-destination-wrap" hidden><span>Destination</span><select id="feedback-destination"><option value="">Select destination</option>${destinationOptions}</select></label>
         <label class="flight-field feedback-detail-field"><span id="feedback-detail-label">Suggested Correction</span><textarea id="feedback-detail" rows="4" required placeholder="Describe the suggested correction"></textarea></label>
-        <label class="flight-field feedback-context-field"><span>Source or evidence (optional)</span><textarea id="feedback-context" rows="3" placeholder="Add a document name, link, date checked, or other evidence"></textarea></label>
-        <div class="feedback-actions"><button class="feedback-submit" type="submit">Save Feedback</button><button class="feedback-copy" type="button" id="feedback-copy" hidden>Copy report</button></div>
+        <div class="feedback-actions"><button class="feedback-submit" type="submit">Send Feedback</button><a class="feedback-submit feedback-whatsapp-fallback" id="feedback-whatsapp-fallback" target="_blank" rel="noopener noreferrer" hidden>Open WhatsApp message</a></div>
         <p id="feedback-status" class="feedback-status" role="status" aria-live="polite"></p>
       </form>
     </article>`;
@@ -179,8 +178,7 @@ function initFeedbackPage() {
   const detailLabel = form.querySelector('#feedback-detail-label');
   const detail = form.querySelector('#feedback-detail');
   const status = form.querySelector('#feedback-status');
-  const copyButton = form.querySelector('#feedback-copy');
-  let savedReport = '';
+  const whatsappFallback = form.querySelector('#feedback-whatsapp-fallback');
   const updateFields = () => {
     const selected = category.value;
     const idea = selected === 'App Idea Suggestions';
@@ -197,25 +195,22 @@ function initFeedbackPage() {
     event.preventDefault();
     const selected = category.value;
     const destinationName = !destinationWrap.hidden && destination.value ? destination.options[destination.selectedIndex].textContent : '';
-    const extra = form.querySelector('#feedback-context').value.trim();
     const lines = [
       'AerKit Feedback',
       `Category: ${selected}`,
       ...(destinationName ? [`Destination: ${destinationName}`] : []),
-      `${selected === 'App Idea Suggestions' ? 'App idea suggestion' : 'Suggested correction'}: ${detail.value.trim()}`,
-      ...(extra ? [`Source or evidence: ${extra}`] : [])
+      `${selected === 'App Idea Suggestions' ? 'App idea suggestion' : 'Suggested correction'}: ${detail.value.trim()}`
     ];
-    savedReport = lines.join('\n\n');
-    try { localStorage.setItem('aerkit-feedback-draft', savedReport); } catch {}
-    status.textContent = 'Feedback saved on this device. Copy the report if you want to share it.';
-    copyButton.hidden = false;
-  });
-  copyButton.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(savedReport);
-      status.textContent = 'Feedback report copied.';
-    } catch {
-      status.textContent = 'Clipboard unavailable. Your feedback remains saved on this device.';
+    const whatsappUrl = `https://wa.me/${FEEDBACK_WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('\n\n'))}`;
+    whatsappFallback.href = whatsappUrl;
+    const whatsappWindow = window.open(whatsappUrl, '_blank');
+    if (whatsappWindow) {
+      whatsappWindow.opener = null;
+      whatsappFallback.hidden = true;
+      status.textContent = 'WhatsApp opened with your message ready. Review it and tap Send.';
+    } else {
+      whatsappFallback.hidden = false;
+      status.textContent = 'WhatsApp could not open automatically. Choose Open WhatsApp message to continue.';
     }
   });
   updateFields();
